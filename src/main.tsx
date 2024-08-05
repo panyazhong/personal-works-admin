@@ -7,6 +7,7 @@ import JoinUnion from "./containers/join-union/index.tsx";
 
 import "./index.css";
 import Login from "./login/index.tsx";
+import ThoughtList from "./containers/thought-list/index.tsx";
 const router = createHashRouter([
   {
     path: "/",
@@ -15,6 +16,10 @@ const router = createHashRouter([
       {
         path: "/join-union",
         element: <JoinUnion />,
+      },
+      {
+        path: "/thought-list",
+        element: <ThoughtList />,
       },
     ],
   },

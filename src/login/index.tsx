@@ -2,6 +2,15 @@ import { Button, Form, Input } from "antd";
 import { useNavigate } from "react-router-dom";
 import { tw } from "twind";
 
+//  const password = values.password;
+//  // console.log("明文：" + password);
+//  const s4 = new (window as any).SM4Util();
+//  //设置密钥
+//  s4.secretKey = SECRET_KEY;
+//  // console.log("密钥:" + s4.secretKey);
+//  //ECB加密
+//  const enPassword = s4.encryptData_ECB(password);
+
 const Login = () => {
   const [form] = Form.useForm();
   const click = async () => {

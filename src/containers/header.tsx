@@ -30,77 +30,25 @@ const Header = () => {
     },
     {
       label: {
-        zh: "艺术家简介",
+        zh: "思想作品集",
         en: "About the Artist",
         fr: "A propos de l’Artiste",
       },
-      path: "/author",
+      path: "/thought-list",
     },
     {
       label: {
-        zh: "艺术作品",
+        zh: "艺术作品集",
         en: "Artistic Works",
         fr: "Œuvres d’art",
       },
-      children: [
-        {
-          label: {
-            zh: "绘画作品",
-            en: "Paintings",
-            fr: "Peintures",
-          },
-          path: "/paintings",
-        },
-        // {
-        //   label: {
-        //     zh: "纪录片作品",
-        //     en: "Documentary Works",
-        //     fr: "Documentaires",
-        //   },
-        //   path: "/a",
-        // },
-        {
-          label: {
-            zh: "作品思想",
-            en: "Réflexions",
-            fr: "Thoughts",
-          },
-          path: "/thoughts",
-        },
-      ],
     },
     {
       label: {
-        zh: "UAFC协会",
+        zh: "展讯集",
         en: "UAFC Union",
         fr: "Union UAFC",
       },
-      children: [
-        {
-          label: {
-            zh: "简介",
-            en: "About the Union",
-            fr: "A propos de l’Union",
-          },
-          path: "/association-introduction",
-        },
-        {
-          label: {
-            zh: "艺术周边",
-            en: "Art Merchandise",
-            fr: "Produits dérivés",
-          },
-          path: "/art-merchandise",
-        },
-        // {
-        //   label: {
-        //     zh: "加入协会",
-        //     en: "Join the Union",
-        //     fr: "Rejoindre l’Union",
-        //   },
-        //   path: "/join-union",
-        // },
-      ],
     },
     {
       label: {
@@ -312,7 +260,7 @@ const Header = () => {
           onClick={() => setOpen(true)}
         />
 
-        <div className={tw`w-[120px] flex gap-2`}>
+        {/* <div className={tw`w-[120px] flex gap-2`}>
           <span
             className={tw`px-1 border rounded-[4px] cursor-pointer border-[${
               color[locale === "zh" ? "active" : "normal"]
@@ -345,7 +293,7 @@ const Header = () => {
           >
             FR
           </span>
-        </div>
+        </div> */}
         {/* <Button
           type="text"
           onClick={() => {
