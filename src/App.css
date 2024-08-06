@@ -59,7 +59,8 @@
   .ant-menu-submenu:hover::after,
   .ant-menu-item:hover::after,
   .ant-menu-submenu-open::after,
-  .ant-menu-submenu-selected::after {
+  .ant-menu-submenu-selected::after,
+  .ant-menu-item-active::after {
     border-bottom-color: #fff !important;
   }
   .ant-menu-submenu-title:active {

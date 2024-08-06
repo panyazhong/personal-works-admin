@@ -177,6 +177,10 @@ const Header = () => {
     setOpen(false);
   };
 
+  const logout = () => {
+    navigate("/login");
+  };
+
   const color = useMemo(() => {
     if (pathname === "/studio-info") {
       return {
@@ -211,6 +215,7 @@ const Header = () => {
             mode="horizontal"
             items={items}
             onClick={menuClick}
+            activeKey={pathname}
             // defaultOpenKeys={["艺术作品"]}
           />
           {/* {Menus.map((menu) => (
@@ -251,6 +256,12 @@ const Header = () => {
           onClick={() => setOpen(true)}
         />
 
+        <div
+          className={tw`w-[48px] flex justify-center items-center h-[36px] cursor-pointer hover:text-[#ffebc8]`}
+          onClick={logout}
+        >
+          登出
+        </div>
         {/* <div className={tw`w-[120px] flex gap-2`}>
           <span
             className={tw`px-1 border rounded-[4px] cursor-pointer border-[${

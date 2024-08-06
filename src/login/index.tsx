@@ -5,6 +5,7 @@ import { css } from "twind/css";
 import Logo from "@/assets/IMG_2914.png";
 
 const Login = () => {
+  const SECRET_KEY = "+Mz@%N.;Dhc|OxXZ";
   const [form] = Form.useForm();
   const click = async () => {
     const valids = await form.validateFields();
@@ -12,11 +13,12 @@ const Login = () => {
     // console.log("明文：" + password);
     const s4 = new (window as any).SM4Util();
     //设置密钥
-    s4.secretKey = "nanfang";
+    s4.secretKey = SECRET_KEY;
     // console.log("密钥:" + s4.secretKey);
     //ECB加密
     const enPassword = s4.encryptData_ECB(password);
 
+    console.log("加密后：" + enPassword);
     const navigate = useNavigate();
     navigate("/");
   };
@@ -48,6 +50,10 @@ const Login = () => {
             background: transparent;
             outline: none;
             box-shadow: none;
+          }
+          .ant-input-outlined.ant-input-status-error:not(.ant-input-disabled) {
+            background: transparent;
+            border: none;
           }
           .ant-input-outlined:focus-within {
             box-shadow: none;
