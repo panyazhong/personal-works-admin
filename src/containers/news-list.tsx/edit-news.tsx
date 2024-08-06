@@ -9,7 +9,7 @@ import {
   UploadProps,
 } from "antd";
 import { useAtom } from "jotai";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ReactQuill from "react-quill";
 import { tw } from "twind";
 import { css } from "twind/css";
@@ -24,9 +24,6 @@ const EditThought = () => {
   const [id] = useAtom(thoughtDetailIdAtom);
   const [value, setValue] = useState("");
   const [form] = Form.useForm();
-  const defaultValue = {
-    language: "zh",
-  };
 
   const props: UploadProps = {
     name: "file",
@@ -57,20 +54,6 @@ const EditThought = () => {
     }
     console.log(valids);
   };
-
-  const getThoughtDetail = async () => {
-    const res = await getThoughtDetailApi(id);
-    if (res.code === 200) {
-      form.setFieldsValue(res.data);
-    } else {
-    }
-  };
-
-  useEffect(() => {
-    if (open) {
-      form.setFieldsValue(defaultValue);
-    }
-  }, [open]);
 
   return (
     <Modal
@@ -108,11 +91,11 @@ const EditThought = () => {
             `}
           `}
       >
-        <Item label="请选择语言" name="language" rules={[{ required: true }]}>
+        <Item label="请选择语言">
           <Radio.Group>
-            <Radio value={"zh"}>中文</Radio>
-            <Radio value={"en"}>英文</Radio>
-            <Radio value={"fr"}>法语</Radio>
+            <Radio value={1}>中文</Radio>
+            <Radio value={2}>英文</Radio>
+            <Radio value={3}>法语</Radio>
           </Radio.Group>
         </Item>
         <Item
@@ -184,7 +167,7 @@ const EditThought = () => {
                 ["bold", "italic", "underline", "strike"], // toggled buttons
                 ["blockquote", "code-block"],
 
-                // [{ header: [1, 2, false] }],
+                // 1, 2, false] }],
                 [{ list: "ordered" }, { list: "bullet" }],
                 [{ script: "sub" }, { script: "super" }],
                 [{ indent: "-1" }, { indent: "+1" }], // outdent/indent

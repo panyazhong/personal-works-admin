@@ -1,32 +1,32 @@
 import {
   Alert,
+  Checkbox,
   Form,
   Input,
   message,
   Modal,
   Radio,
+  Select,
   Upload,
   UploadProps,
 } from "antd";
 import { useAtom } from "jotai";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ReactQuill from "react-quill";
 import { tw } from "twind";
 import { css } from "twind/css";
-import { thoughtDetailIdAtom, thoughtOpenAtom } from ".";
+import { thoughtDetailIdAtom, paintingOpenAtom } from ".";
 import { InboxOutlined } from "@ant-design/icons";
 
 const { Item } = Form;
 const { Dragger } = Upload;
 
 const EditThought = () => {
-  const [open, setOpen] = useAtom(thoughtOpenAtom);
+  const [open, setOpen] = useAtom(paintingOpenAtom);
   const [id] = useAtom(thoughtDetailIdAtom);
   const [value, setValue] = useState("");
+  const [isRelated, setIsRelated] = useState<boolean>(false);
   const [form] = Form.useForm();
-  const defaultValue = {
-    language: "zh",
-  };
 
   const props: UploadProps = {
     name: "file",
@@ -57,20 +57,6 @@ const EditThought = () => {
     }
     console.log(valids);
   };
-
-  const getThoughtDetail = async () => {
-    const res = await getThoughtDetailApi(id);
-    if (res.code === 200) {
-      form.setFieldsValue(res.data);
-    } else {
-    }
-  };
-
-  useEffect(() => {
-    if (open) {
-      form.setFieldsValue(defaultValue);
-    }
-  }, [open]);
 
   return (
     <Modal
@@ -108,11 +94,11 @@ const EditThought = () => {
             `}
           `}
       >
-        <Item label="请选择语言" name="language" rules={[{ required: true }]}>
+        <Item label="请选择语言">
           <Radio.Group>
-            <Radio value={"zh"}>中文</Radio>
-            <Radio value={"en"}>英文</Radio>
-            <Radio value={"fr"}>法语</Radio>
+            <Radio value={1}>中文</Radio>
+            <Radio value={2}>英文</Radio>
+            <Radio value={3}>法语</Radio>
           </Radio.Group>
         </Item>
         <Item
@@ -127,18 +113,17 @@ const EditThought = () => {
         >
           <Input placeholder="文章标题" />
         </Item>
-        <Item
-          label="文章简介"
-          name="desc"
-          rules={[
-            {
-              required: true,
-              message: "请填写文章简介",
-            },
-          ]}
+        <Checkbox
+          checked={isRelated}
+          onChange={(e) => setIsRelated(e.target.checked)}
         >
-          <Input.TextArea rows={5} placeholder="文章简介" />
-        </Item>
+          是否关联文章
+        </Checkbox>
+        {isRelated && (
+          <Item label="关联文章">
+            <Select options={[]} />
+          </Item>
+        )}
         <Item
           label="封面上传"
           name="desc"
@@ -161,48 +146,6 @@ const EditThought = () => {
               uploading company data or other banned files.
             </p>
           </Dragger>
-        </Item>
-        <Item
-          label="文章内容"
-          className={tw`text-frc-300`}
-          rules={[
-            {
-              required: true,
-              message: "请填写文章内容",
-            },
-          ]}
-        >
-          <ReactQuill
-            style={{
-              height: "500px",
-            }}
-            theme="snow"
-            value={value}
-            onChange={setValue}
-            modules={{
-              toolbar: [
-                ["bold", "italic", "underline", "strike"], // toggled buttons
-                ["blockquote", "code-block"],
-
-                // [{ header: [1, 2, false] }],
-                [{ list: "ordered" }, { list: "bullet" }],
-                [{ script: "sub" }, { script: "super" }],
-                [{ indent: "-1" }, { indent: "+1" }], // outdent/indent
-                [{ direction: "rtl" }], // text direction
-
-                // [{ size: ["small", false, "large", "huge"] }], // custom dropdown
-                [{ header: [1, 2, 3, 4, 5, 6, false] }],
-
-                [{ color: [] }, { background: [] }], // dropdown with defaults from theme
-                [{ font: [] }],
-                [{ align: [] }],
-
-                // ["clean"], // remove formatting button
-
-                ["link", "image", "video"], // link and image, video
-              ],
-            }}
-          />
         </Item>
       </Form>
     </Modal>

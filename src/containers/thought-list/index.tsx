@@ -1,17 +1,24 @@
-import { Button, Table } from "antd";
-import { ColumnType } from "antd/es/list";
-import { ColumnProps } from "antd/es/table";
+import { Button, Table, TableColumnType } from "antd";
 import { tw } from "twind";
 import EditThought from "./edit-thought";
 import { atom, useAtom } from "jotai";
+import { useEffect, useState } from "react";
+import { queryArticleList } from "../../api";
 
 export const thoughtOpenAtom = atom(false);
 export const thoughtDetailIdAtom = atom("");
 
+interface IThought {
+  name: string;
+  desc: string;
+  opearate: string;
+}
+
 const ThoughtList = () => {
   const [open, setOpen] = useAtom(thoughtOpenAtom);
   const [, setId] = useAtom(thoughtDetailIdAtom);
-  const columns: ColumnType[] = [
+  const [tableData, setTableData] = useState<IThought[]>([]);
+  const columns: TableColumnType<any>[] = [
     {
       dataIndex: "name",
       title: "名称",
@@ -48,21 +55,31 @@ const ThoughtList = () => {
     setId("");
     setOpen(true);
   };
+
+  const getThoughtList = async () => {
+    // 获取数据并设置到tableData
+    const res = await queryArticleList();
+
+    if (res.code === 200) {
+      setTableData(res.data);
+    }
+  };
+
+  useEffect(() => {
+    getThoughtList();
+  }, []);
   return (
     <div>
-      <>
+      <div className={tw`mb-2`}>
         <Button onClick={handleAdd} type="primary">
           新增
         </Button>
-      </>
+      </div>
       <Table
         columns={columns}
         pagination={false}
-        dataSource={[
-          {
-            name: "123",
-          },
-        ]}
+        dataSource={tableData}
+        rowKey={(record) => record.groupId}
       />
 
       {open && <EditThought />}

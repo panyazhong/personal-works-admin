@@ -42,6 +42,7 @@ const Header = () => {
         en: "Artistic Works",
         fr: "Œuvres d’art",
       },
+      path: "/painting-list",
     },
     {
       label: {
@@ -49,6 +50,7 @@ const Header = () => {
         en: "UAFC Union",
         fr: "Union UAFC",
       },
+      path: "/news-list",
     },
     {
       label: {
@@ -101,20 +103,9 @@ const Header = () => {
   console.log(pathname);
   const items: MenuProps["items"] = useMemo(() => {
     const res = Menus.map((menu) => {
-      if (!menu.children) {
-        return {
-          label: menu.label[locale],
-          key: menu.path,
-        };
-      }
-
       return {
         label: menu.label[locale],
-        key: menu.label[locale],
-        children: menu.children.map((child) => ({
-          label: child.label[locale],
-          key: child.path,
-        })),
+        key: menu.path,
       };
     }) as ItemType[];
 
