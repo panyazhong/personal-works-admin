@@ -3,24 +3,31 @@ import { useNavigate } from "react-router-dom";
 import { tw } from "twind";
 import { css } from "twind/css";
 import Logo from "@/assets/IMG_2914.png";
+import { login } from "../api";
 
 const Login = () => {
   const SECRET_KEY = "+Mz@%N.;Dhc|OxXZ";
   const [form] = Form.useForm();
   const click = async () => {
-    const valids = await form.validateFields();
-    const password = valids.password;
-    // console.log("明文：" + password);
-    const s4 = new (window as any).SM4Util();
-    //设置密钥
-    s4.secretKey = SECRET_KEY;
-    // console.log("密钥:" + s4.secretKey);
-    //ECB加密
-    const enPassword = s4.encryptData_ECB(password);
+    try {
+      const valids = await form.validateFields();
+      const password = valids.password;
+      // console.log("明文：" + password);
+      const s4 = new (window as any).SM4Util();
+      //设置密钥
+      s4.secretKey = SECRET_KEY;
+      // console.log("密钥:" + s4.secretKey);
+      //ECB加密
+      const enPassword = s4.encryptData_ECB(password);
 
-    console.log("加密后：" + enPassword);
-    const navigate = useNavigate();
-    navigate("/");
+      valids.password = enPassword;
+
+      const res = await login(valids);
+
+      localStorage.setItem("token", res);
+      const navigate = useNavigate();
+      navigate("/");
+    } catch (error) {}
   };
   return (
     <div

@@ -1,4 +1,19 @@
-import axios from "axios";
+import axios from "./httpRequest";
+
+const login = (data: {
+  username: string;
+  password: string;
+}): Promise<string> => {
+  return axios
+    .request({
+      url: "/admin/login",
+      method: "post",
+      data,
+    })
+    .then((res) => {
+      return res.data;
+    });
+};
 
 const queryArticleList = () => {
   return axios
@@ -67,6 +82,7 @@ const queryExhibitionDetail = (data: { groupId: string }) => {
 };
 
 export {
+  login,
   queryArticleList,
   queryArticleDetail,
   queryPaintList,
