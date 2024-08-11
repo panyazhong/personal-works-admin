@@ -8,6 +8,7 @@ import { login } from "../api";
 const Login = () => {
   const SECRET_KEY = "+Mz@%N.;Dhc|OxXZ";
   const [form] = Form.useForm();
+  const navigate = useNavigate();
   const click = async () => {
     try {
       const valids = await form.validateFields();
@@ -24,8 +25,8 @@ const Login = () => {
 
       const res = await login(valids);
 
-      localStorage.setItem("token", res);
-      const navigate = useNavigate();
+      localStorage.setItem("token", res.token);
+
       navigate("/");
     } catch (error) {}
   };
@@ -82,7 +83,7 @@ const Login = () => {
           <Form form={form} layout="vertical">
             <Form.Item
               label="账号"
-              name="account"
+              name="username"
               rules={[
                 {
                   required: true,

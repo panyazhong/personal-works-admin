@@ -2,7 +2,7 @@ import { message } from "antd";
 import axios from "axios";
 
 const request = axios.create({
-  baseURL: "/back",
+  baseURL: "/back/admin",
   timeout: 5000,
   headers: {
     "Content-Type": "application/json",

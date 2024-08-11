@@ -1,12 +1,13 @@
 import axios from "./httpRequest";
+import { IThought } from "./interface";
 
 const login = (data: {
   username: string;
   password: string;
-}): Promise<string> => {
+}): Promise<{ token: string }> => {
   return axios
     .request({
-      url: "/admin/login",
+      url: "/login",
       method: "post",
       data,
     })
@@ -15,10 +16,10 @@ const login = (data: {
     });
 };
 
-const queryArticleList = () => {
+const queryArticleList = (): Promise<IThought[]> => {
   return axios
     .request({
-      url: "/back/article/queryArticleList",
+      url: "/article/queryArticleList",
       method: "post",
     })
     .then((res) => {
@@ -28,7 +29,7 @@ const queryArticleList = () => {
 const queryArticleDetail = (data: { groupId: string }) => {
   return axios
     .request({
-      url: "/back/article/queryArticleDetail",
+      url: "/article/queryArticleDetail",
       method: "post",
       data,
     })
@@ -40,7 +41,7 @@ const queryArticleDetail = (data: { groupId: string }) => {
 const queryPaintList = () => {
   return axios
     .request({
-      url: "/back/paint/queryPaintList",
+      url: "/paint/queryPaintList",
       method: "post",
     })
     .then((res) => {
@@ -50,7 +51,7 @@ const queryPaintList = () => {
 const queryPaintDetail = (data: { groupId: string }) => {
   return axios
     .request({
-      url: "/back/paint/queryPaintDetail",
+      url: "/paint/queryPaintDetail",
       method: "post",
       data,
     })
@@ -62,7 +63,7 @@ const queryPaintDetail = (data: { groupId: string }) => {
 const queryExhibitionList = () => {
   return axios
     .request({
-      url: "/back/exhibition/queryExhibitionList",
+      url: "/exhibition/queryExhibitionList",
       method: "post",
     })
     .then((res) => {
@@ -72,7 +73,7 @@ const queryExhibitionList = () => {
 const queryExhibitionDetail = (data: { groupId: string }) => {
   return axios
     .request({
-      url: "/back/exhibition/queryExhibitionDetail",
+      url: "/exhibition/queryExhibitionDetail",
       method: "post",
       data,
     })

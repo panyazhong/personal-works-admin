@@ -4,15 +4,10 @@ import EditThought from "./edit-thought";
 import { atom, useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { queryArticleList } from "../../api";
+import { IThought } from "../../api/interface";
 
 export const thoughtOpenAtom = atom(false);
 export const thoughtDetailIdAtom = atom("");
-
-interface IThought {
-  name: string;
-  desc: string;
-  opearate: string;
-}
 
 const ThoughtList = () => {
   const [open, setOpen] = useAtom(thoughtOpenAtom);
@@ -22,14 +17,33 @@ const ThoughtList = () => {
     {
       dataIndex: "name",
       title: "名称",
+      width: "300px",
+      render: (text, record, index) => {
+        return (
+          <div className={tw(`truncate max-w-[300px]`)}>
+            {record.zh.title || "--"}
+          </div>
+        );
+      },
     },
     {
       dataIndex: "desc",
       title: "文章简介",
+      width: 400,
+      flex: 1,
+      render: (text, record, index) => {
+        return (
+          <div
+            className={tw``}
+            dangerouslySetInnerHTML={{ __html: record.zh.summary }}
+          />
+        );
+      },
     },
     {
       dataIndex: "opearate",
       title: "操作",
+      width: 100,
       render: (text, record, index) => {
         return (
           <div className={tw`flex gap-2`}>
@@ -60,14 +74,15 @@ const ThoughtList = () => {
     // 获取数据并设置到tableData
     const res = await queryArticleList();
 
-    if (res.code === 200) {
-      setTableData(res.data);
-    }
+    console.log(res);
+
+    setTableData(res);
   };
 
   useEffect(() => {
     getThoughtList();
   }, []);
+
   return (
     <div>
       <div className={tw`mb-2`}>
