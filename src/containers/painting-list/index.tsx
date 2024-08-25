@@ -3,6 +3,8 @@ import { tw } from "twind";
 import Editpainting from "./edit-painting";
 import { atom, useAtom } from "jotai";
 import PaintingPreview from "./painting-preview";
+import { queryPaintList } from "../../api";
+import { useEffect, useState } from "react";
 
 export const paintingOpenAtom = atom(false);
 export const previewOpenAtom = atom(false);
@@ -12,10 +14,27 @@ const PaintingList = () => {
   const [open, setOpen] = useAtom(paintingOpenAtom);
   const [previewOpen, setPreviewOpen] = useAtom(previewOpenAtom);
   const [, setId] = useAtom(thoughtDetailIdAtom);
+
+  const [paintings, setPaintings] = useState([]);
+  const [previewPath, setPreviewPath] = useState("");
+
   const columns: TableColumnType<any>[] = [
     {
       dataIndex: "name",
       title: "名称",
+      render: (text, record, index) => {
+        return (
+          <div
+            className={tw`cursor-pointer`}
+            onClick={() => {
+              setPreviewPath(record.zh.imgPath);
+              setPreviewOpen(true);
+            }}
+          >
+            {record.zh.title}
+          </div>
+        );
+      },
     },
     {
       dataIndex: "opearate",
@@ -26,6 +45,7 @@ const PaintingList = () => {
             <Button
               type="link"
               onClick={() => {
+                setPreviewPath(record.zh.imgPath);
                 setPreviewOpen(true);
               }}
             >
@@ -49,10 +69,22 @@ const PaintingList = () => {
     },
   ];
 
+  const query = () => {
+    queryPaintList().then((res) => {
+      console.log(res);
+      setPaintings(res);
+    });
+  };
+
   const handleAdd = () => {
     setId("");
     setOpen(true);
   };
+
+  useEffect(() => {
+    query();
+  }, []);
+
   return (
     <div>
       <div className={tw`mb-2`}>
@@ -60,18 +92,10 @@ const PaintingList = () => {
           新增
         </Button>
       </div>
-      <Table
-        columns={columns}
-        pagination={false}
-        dataSource={[
-          {
-            name: "123",
-          },
-        ]}
-      />
+      <Table columns={columns} pagination={false} dataSource={paintings} />
 
       {open && <Editpainting />}
-      {previewOpen && <PaintingPreview />}
+      {previewOpen && <PaintingPreview imgPath={previewPath} />}
     </div>
   );
 };

@@ -52,31 +52,31 @@ const Header = () => {
       },
       path: "/news-list",
     },
-    {
-      label: {
-        zh: "海怪工作室",
-        en: "Atelier Sea Monster",
-        fr: "Atelier Sea Monster",
-      },
-      // path: "/personal-works",
-      path: "/studio-info",
-    },
-    {
-      label: {
-        zh: "展讯",
-        en: "Exhibition News",
-        fr: "Actualités d’expositions",
-      },
-      path: "/exhibition-news",
-    },
-    {
-      label: {
-        zh: "联系方式",
-        en: "Contact Information",
-        fr: "Contact",
-      },
-      path: "/contract-info",
-    },
+    // {
+    //   label: {
+    //     zh: "海怪工作室",
+    //     en: "Atelier Sea Monster",
+    //     fr: "Atelier Sea Monster",
+    //   },
+    //   // path: "/personal-works",
+    //   path: "/studio-info",
+    // },
+    // {
+    //   label: {
+    //     zh: "展讯",
+    //     en: "Exhibition News",
+    //     fr: "Actualités d’expositions",
+    //   },
+    //   path: "/exhibition-news",
+    // },
+    // {
+    //   label: {
+    //     zh: "联系方式",
+    //     en: "Contact Information",
+    //     fr: "Contact",
+    //   },
+    //   path: "/contract-info",
+    // },
   ];
 
   // const options = [

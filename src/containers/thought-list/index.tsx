@@ -12,7 +12,9 @@ export const thoughtDetailIdAtom = atom("");
 const ThoughtList = () => {
   const [open, setOpen] = useAtom(thoughtOpenAtom);
   const [, setId] = useAtom(thoughtDetailIdAtom);
+
   const [tableData, setTableData] = useState<IThought[]>([]);
+
   const columns: TableColumnType<any>[] = [
     {
       dataIndex: "name",
@@ -51,7 +53,7 @@ const ThoughtList = () => {
               type="primary"
               onClick={() => {
                 setOpen(true);
-                setId(record.groupId);
+                setId(record.zh.groupId);
               }}
             >
               编辑
@@ -73,8 +75,6 @@ const ThoughtList = () => {
   const getThoughtList = async () => {
     // 获取数据并设置到tableData
     const res = await queryArticleList();
-
-    console.log(res);
 
     setTableData(res);
   };

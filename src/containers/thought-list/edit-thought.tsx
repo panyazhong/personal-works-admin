@@ -15,6 +15,7 @@ import { tw } from "twind";
 import { css } from "twind/css";
 import { thoughtDetailIdAtom, thoughtOpenAtom } from ".";
 import { InboxOutlined } from "@ant-design/icons";
+import { queryArticleDetail } from "../../api";
 
 const { Item } = Form;
 const { Dragger } = Upload;
@@ -59,7 +60,7 @@ const EditThought = () => {
   };
 
   const getThoughtDetail = async () => {
-    const res = await getThoughtDetailApi(id);
+    const res = await queryArticleDetail({ groupId: id });
     if (res.code === 200) {
       form.setFieldsValue(res.data);
     } else {
@@ -68,7 +69,7 @@ const EditThought = () => {
 
   useEffect(() => {
     if (open) {
-      form.setFieldsValue(defaultValue);
+      getThoughtDetail();
     }
   }, [open]);
 
