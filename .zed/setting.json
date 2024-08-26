@@ -1,0 +1,13 @@
+{
+  "tasks": {
+    "formatWithPrettier": {
+      "cmd": "npx prettier --write ${file}",
+      "sh": true
+    }
+  },
+  "events": {
+    "onSave": {
+      "tasks": ["formatWithPrettier"]
+    }
+  }
+}
