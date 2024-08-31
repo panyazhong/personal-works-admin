@@ -1,8 +1,13 @@
-import { Button, Table, TableColumnType } from "antd";
+import { Button, Modal, Table, TableColumnType } from "antd";
 import { tw } from "twind";
 import EditThought from "./edit-news";
 import { atom, useAtom } from "jotai";
-import { queryExhibitionList } from "../../api";
+import {
+  deleteExhibition,
+  publishExhibition,
+  queryExhibitionList,
+  unPublishExhibition,
+} from "../../api";
 import { useEffect, useState } from "react";
 
 export const thoughtOpenAtom = atom(false);
@@ -39,7 +44,51 @@ const NewsList = () => {
             >
               编辑
             </Button>
-            <Button type="primary" danger>
+            <Button
+              type="dashed"
+              onClick={() => {
+                Modal.confirm({
+                  title: "发布",
+                  content: "确定发布吗",
+                  onOk: async () => {
+                    await publishExhibition(record.groupId);
+                    message.success("发布成功");
+                  },
+                });
+              }}
+            >
+              发布
+            </Button>
+            <Button
+              type="primary"
+              danger
+              onClick={() => {
+                Modal.confirm({
+                  title: "取消发布",
+                  content: "确定取消发布吗？",
+                  onOk: async () => {
+                    await unPublishExhibition(record.groupId);
+                    message.success("取消发布成功");
+                  },
+                });
+              }}
+            >
+              取消发布
+            </Button>
+            <Button
+              type="primary"
+              danger
+              onClick={() => {
+                Modal.confirm({
+                  title: "删除",
+                  content: "确定删除吗？",
+                  onOk: async () => {
+                    await deleteExhibition(record.groupId);
+                    message.success("删除成功");
+                  },
+                });
+              }}
+            >
               删除
             </Button>
           </div>

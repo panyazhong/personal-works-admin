@@ -1,9 +1,14 @@
-import { Button, Table, TableColumnType } from "antd";
+import { Button, Modal, Table, TableColumnType } from "antd";
 import { tw } from "twind";
 import EditThought from "./edit-thought";
 import { atom, useAtom } from "jotai";
 import { useEffect, useState } from "react";
-import { queryArticleList } from "../../api";
+import {
+  deleteArticle,
+  publishArticle,
+  queryArticleList,
+  unPublishArticle,
+} from "../../api";
 import { IThought } from "../../api/interface";
 
 export const thoughtOpenAtom = atom(false);
@@ -58,7 +63,51 @@ const ThoughtList = () => {
             >
               编辑
             </Button>
-            <Button type="primary" danger>
+            <Button
+              type="dashed"
+              onClick={() => {
+                Modal.confirm({
+                  title: "发布",
+                  content: "确定发布吗",
+                  onOk: async () => {
+                    await publishArticle(record.groupId);
+                    message.success("发布成功");
+                  },
+                });
+              }}
+            >
+              发布
+            </Button>
+            <Button
+              type="primary"
+              danger
+              onClick={() => {
+                Modal.confirm({
+                  title: "取消发布",
+                  content: "确定取消发布吗？",
+                  onOk: async () => {
+                    await unPublishArticle(record.groupId);
+                    message.success("取消发布成功");
+                  },
+                });
+              }}
+            >
+              取消发布
+            </Button>
+            <Button
+              type="primary"
+              danger
+              onClick={() => {
+                Modal.confirm({
+                  title: "删除",
+                  content: "确定删除吗？",
+                  onOk: async () => {
+                    await deleteArticle(record.groupId);
+                    message.success("删除成功");
+                  },
+                });
+              }}
+            >
               删除
             </Button>
           </div>
