@@ -22,3 +22,15 @@ export interface IThought {
   zh: Article | null;
   groupId: number;
 }
+
+type ExhibitionItem = {
+  title: string;
+  content: string;
+  imgPath: string;
+  author: string;
+};
+export interface Exhibition {
+  zh: ExhibitionItem;
+  en: ExhibitionItem;
+  fr: ExhibitionItem;
+}

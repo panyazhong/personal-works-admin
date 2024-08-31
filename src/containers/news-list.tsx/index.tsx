@@ -71,7 +71,12 @@ const NewsList = () => {
           新增
         </Button>
       </div>
-      <Table columns={columns} pagination={false} dataSource={newsList} />
+      <Table
+        columns={columns}
+        pagination={false}
+        dataSource={newsList}
+        rowKey="groupId"
+      />
 
       {open && <EditThought />}
     </div>

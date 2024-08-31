@@ -60,6 +60,18 @@ const queryPaintDetail = (data: { groupId: string }) => {
     });
 };
 
+/** ----------------------news-------------------------- */
+const addExhibition = (data: any) => {
+  return axios
+    .request({
+      url: "/exhibition/add",
+      method: "post",
+      data,
+    })
+    .then((res) => {
+      return res.data;
+    });
+};
 const queryExhibitionList = () => {
   return axios
     .request({
