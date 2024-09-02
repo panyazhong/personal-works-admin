@@ -13,7 +13,6 @@ export interface Article {
   title: string;
   updateBy: number;
   updateTime: string;
-  groupId: number;
 }
 
 export interface IThought {

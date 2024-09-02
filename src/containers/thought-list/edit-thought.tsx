@@ -1,6 +1,7 @@
 import {
   Alert,
   Form,
+  Image,
   Input,
   message,
   Modal,
@@ -14,8 +15,9 @@ import ReactQuill from "react-quill";
 import { tw } from "twind";
 import { css } from "twind/css";
 import { thoughtDetailIdAtom, thoughtOpenAtom } from ".";
-import { InboxOutlined } from "@ant-design/icons";
+import { InboxOutlined, PlusOutlined } from "@ant-design/icons";
 import { queryArticleDetail } from "../../api";
+import { Article, IThought } from "../../api/interface";
 
 const { Item } = Form;
 const { Dragger } = Upload;
@@ -24,14 +26,17 @@ const EditThought = () => {
   const [open, setOpen] = useAtom(thoughtOpenAtom);
   const [id] = useAtom(thoughtDetailIdAtom);
   const [value, setValue] = useState("");
+  const [language, setLanguage] = useState("zh");
   const [form] = Form.useForm();
+
+  const [editInfo, setEditInfo] = useState<IThought>();
   const defaultValue = {
     language: "zh",
   };
 
   const props: UploadProps = {
     name: "file",
-    multiple: true,
+    listType: "picture-card",
     action: "https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload",
     onChange(info) {
       const { status } = info.file;
@@ -61,15 +66,19 @@ const EditThought = () => {
 
   const getThoughtDetail = async () => {
     const res = await queryArticleDetail({ groupId: id });
-    if (res.code === 200) {
-      form.setFieldsValue(res.data);
-    } else {
-    }
+
+    setEditInfo(res);
+
+    form.setFieldsValue({
+      ...res["zh"],
+      language: "zh",
+    });
   };
 
   useEffect(() => {
     if (open) {
       getThoughtDetail();
+      form.setFieldsValue(defaultValue);
     }
   }, [open]);
 
@@ -90,7 +99,7 @@ const EditThought = () => {
           .ant-modal-footer {
             margin-top: 80px;
           }
-        `} 
+        `}
       `}
     >
       <Alert message="三种语言版本需要分别提交保存！！！" banner />
@@ -110,7 +119,13 @@ const EditThought = () => {
           `}
       >
         <Item label="请选择语言" name="language" rules={[{ required: true }]}>
-          <Radio.Group>
+          <Radio.Group
+            value={language}
+            onChange={(e) => {
+              console.log(e.target);
+              setLanguage(e.target.value);
+            }}
+          >
             <Radio value={"zh"}>中文</Radio>
             <Radio value={"en"}>英文</Radio>
             <Radio value={"fr"}>法语</Radio>
@@ -130,7 +145,7 @@ const EditThought = () => {
         </Item>
         <Item
           label="文章简介"
-          name="desc"
+          name="summary"
           rules={[
             {
               required: true,
@@ -138,11 +153,32 @@ const EditThought = () => {
             },
           ]}
         >
-          <Input.TextArea rows={5} placeholder="文章简介" />
+          <ReactQuill
+            theme="snow"
+            value={
+              (editInfo?.[language as keyof IThought] as Article)?.summary || ""
+            }
+            onChange={(val) => {
+              setEditInfo((prev) => {
+                if (!prev) {
+                  return {} as IThought;
+                }
+
+                return {
+                  ...prev,
+                  [language as keyof IThought]: {
+                    ...(prev[language as keyof IThought] as Article),
+                    summary: val,
+                  },
+                };
+              });
+            }}
+          />
         </Item>
+
         <Item
           label="封面上传"
-          name="desc"
+          name="imgPath"
           rules={[
             {
               required: true,
@@ -150,7 +186,16 @@ const EditThought = () => {
             },
           ]}
         >
-          <Dragger {...props}>
+          {id && (
+            <Image
+              src={`http://www.nanfang-art.com${
+                (editInfo?.[language as keyof IThought] as Article)?.imgPath
+              }`}
+              height={200}
+              preview={false}
+            />
+          )}
+          {/* <Dragger {...props}>
             <p className="ant-upload-drag-icon">
               <InboxOutlined />
             </p>
@@ -161,7 +206,13 @@ const EditThought = () => {
               Support for a single or bulk upload. Strictly prohibited from
               uploading company data or other banned files.
             </p>
-          </Dragger>
+          </Dragger> */}
+          <Upload {...props}>
+            <button style={{ border: 0, background: "none" }} type="button">
+              <PlusOutlined />
+              <div style={{ marginTop: 8 }}>Upload</div>
+            </button>
+          </Upload>
         </Item>
         <Item
           label="文章内容"
@@ -178,8 +229,24 @@ const EditThought = () => {
               height: "500px",
             }}
             theme="snow"
-            value={value}
-            onChange={setValue}
+            value={
+              (editInfo?.[language as keyof IThought] as Article)?.content || ""
+            }
+            onChange={(val) => {
+              setEditInfo((prev) => {
+                if (!prev) {
+                  return {} as IThought;
+                }
+
+                return {
+                  ...prev,
+                  [language as keyof IThought]: {
+                    ...(prev[language as keyof IThought] as Article),
+                    content: val,
+                  },
+                };
+              });
+            }}
             modules={{
               toolbar: [
                 ["bold", "italic", "underline", "strike"], // toggled buttons
