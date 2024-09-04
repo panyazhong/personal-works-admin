@@ -1,5 +1,5 @@
 import axios from './httpRequest';
-import { IThought } from './interface';
+import { AddPaint, IThought } from './interface';
 
 const login = (data: {
   username: string;
@@ -19,7 +19,7 @@ const login = (data: {
 const queryArticleList = (): Promise<IThought[]> => {
   return axios
     .request({
-      url: '/admin/article/queryArticleList',
+      url: '/article/queryArticleList',
       method: 'post',
     })
     .then((res) => {
@@ -40,8 +40,8 @@ const queryArticleDetail = (data: { groupId: string }): Promise<IThought> => {
 const deleteArticle = (data: { groupId: string }) => {
   return axios
     .request({
-      url: "/article/delete",
-      method: "post",
+      url: '/article/delete',
+      method: 'post',
       data,
     })
     .then((res) => {
@@ -51,8 +51,8 @@ const deleteArticle = (data: { groupId: string }) => {
 const publishArticle = (data: { groupId: string }) => {
   return axios
     .request({
-      url: "/article/publish",
-      method: "post",
+      url: '/article/publish',
+      method: 'post',
       data,
     })
     .then((res) => {
@@ -62,8 +62,8 @@ const publishArticle = (data: { groupId: string }) => {
 const unPublishArticle = (data: { groupId: string }) => {
   return axios
     .request({
-      url: "/article/unPublish",
-      method: "post",
+      url: '/article/unPublish',
+      method: 'post',
       data,
     })
     .then((res) => {
@@ -71,6 +71,7 @@ const unPublishArticle = (data: { groupId: string }) => {
     });
 };
 
+/** ---------------paint----------------------------- */
 const queryPaintList = () => {
   return axios
     .request({
@@ -95,8 +96,8 @@ const queryPaintDetail = (data: { groupId: string }) => {
 const deletePaint = (data: { groupId: string }) => {
   return axios
     .request({
-      url: "/paint/delete",
-      method: "post",
+      url: '/paint/delete',
+      method: 'post',
       data,
     })
     .then((res) => {
@@ -106,8 +107,8 @@ const deletePaint = (data: { groupId: string }) => {
 const publishPaint = (data: { groupId: string }) => {
   return axios
     .request({
-      url: "/paint/publish",
-      method: "post",
+      url: '/paint/publish',
+      method: 'post',
       data,
     })
     .then((res) => {
@@ -117,9 +118,37 @@ const publishPaint = (data: { groupId: string }) => {
 const unPublishPaint = (data: { groupId: string }) => {
   return axios
     .request({
-      url: "/paint/unPublish",
-      method: "post",
+      url: '/paint/unPublish',
+      method: 'post',
       data,
+    })
+    .then((res) => {
+      return res.data;
+    });
+};
+const addPaint = (data: AddPaint) => {
+  return axios
+    .request({
+      url: '/paint/add',
+      method: 'post',
+      data,
+    })
+    .then((res) => {
+      return res;
+    })
+    .catch((err) => {
+      return Promise.reject(err);
+    });
+};
+const uploadPaint = (data: any) => {
+  return axios
+    .request({
+      url: '/paint/upload',
+      method: 'post',
+      data,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     })
     .then((res) => {
       return res.data;
@@ -130,8 +159,8 @@ const unPublishPaint = (data: { groupId: string }) => {
 const addExhibition = (data: any) => {
   return axios
     .request({
-      url: "/exhibition/add",
-      method: "post",
+      url: '/exhibition/add',
+      method: 'post',
       data,
     })
     .then((res) => {
@@ -162,8 +191,8 @@ const queryExhibitionDetail = (data: { groupId: string }) => {
 const deleteExhibition = (data: { groupId: string }) => {
   return axios
     .request({
-      url: "/exhibition/publish",
-      method: "post",
+      url: '/exhibition/publish',
+      method: 'post',
       data,
     })
     .then((res) => {
@@ -173,8 +202,8 @@ const deleteExhibition = (data: { groupId: string }) => {
 const publishExhibition = (data: { groupId: string }) => {
   return axios
     .request({
-      url: "/exhibition/publish",
-      method: "post",
+      url: '/exhibition/publish',
+      method: 'post',
       data,
     })
     .then((res) => {
@@ -184,8 +213,8 @@ const publishExhibition = (data: { groupId: string }) => {
 const unPublishExhibition = (data: { groupId: string }) => {
   return axios
     .request({
-      url: "/exhibition/unPublish",
-      method: "post",
+      url: '/exhibition/unPublish',
+      method: 'post',
       data,
     })
     .then((res) => {
@@ -194,16 +223,21 @@ const unPublishExhibition = (data: { groupId: string }) => {
 };
 export {
   login,
+  // article
   queryArticleList,
   queryArticleDetail,
   deleteArticle,
   publishArticle,
   unPublishArticle,
+  // paint
   queryPaintList,
   queryPaintDetail,
   deletePaint,
   publishPaint,
   unPublishPaint,
+  uploadPaint,
+  addPaint,
+  // news
   addExhibition,
   queryExhibitionList,
   queryExhibitionDetail,

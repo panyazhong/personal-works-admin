@@ -1,19 +1,19 @@
-import { Button, Modal, Table, TableColumnType } from "antd";
-import { tw } from "twind";
-import Editpainting from "./edit-painting";
-import { atom, useAtom } from "jotai";
-import PaintingPreview from "./painting-preview";
+import { Button, message, Modal, Table, TableColumnType } from 'antd';
+import { tw } from 'twind';
+import Editpainting from './edit-painting';
+import { atom, useAtom } from 'jotai';
+import PaintingPreview from './painting-preview';
 import {
   deletePaint,
   publishPaint,
   queryPaintList,
   unPublishPaint,
-} from "../../api";
-import { useEffect, useState } from "react";
+} from '../../api';
+import { useEffect, useState } from 'react';
 
 export const paintingOpenAtom = atom(false);
 export const previewOpenAtom = atom(false);
-export const thoughtDetailIdAtom = atom("");
+export const thoughtDetailIdAtom = atom('');
 
 const PaintingList = () => {
   const [open, setOpen] = useAtom(paintingOpenAtom);
@@ -21,12 +21,12 @@ const PaintingList = () => {
   const [, setId] = useAtom(thoughtDetailIdAtom);
 
   const [paintings, setPaintings] = useState([]);
-  const [previewPath, setPreviewPath] = useState("");
+  const [previewPath, setPreviewPath] = useState('');
 
   const columns: TableColumnType<any>[] = [
     {
-      dataIndex: "name",
-      title: "名称",
+      dataIndex: 'name',
+      title: '名称',
       render: (text, record, index) => {
         return (
           <div
@@ -42,8 +42,8 @@ const PaintingList = () => {
       },
     },
     {
-      dataIndex: "opearate",
-      title: "操作",
+      dataIndex: 'opearate',
+      title: '操作',
       render: (text, record, index) => {
         return (
           <div className={tw`flex gap-2`}>
@@ -64,16 +64,17 @@ const PaintingList = () => {
               }}
             >
               编辑
-            </Button>{" "}
+            </Button>{' '}
             <Button
               type="dashed"
               onClick={() => {
                 Modal.confirm({
-                  title: "发布",
-                  content: "确定发布吗",
+                  title: '发布',
+                  content: '确定发布吗',
                   onOk: async () => {
                     await publishPaint(record.groupId);
-                    message.success("发布成功");
+                    message.success('发布成功');
+                    query();
                   },
                 });
               }}
@@ -85,11 +86,12 @@ const PaintingList = () => {
               danger
               onClick={() => {
                 Modal.confirm({
-                  title: "取消发布",
-                  content: "确定取消发布吗？",
+                  title: '取消发布',
+                  content: '确定取消发布吗？',
                   onOk: async () => {
                     await unPublishPaint(record.groupId);
-                    message.success("取消发布成功");
+                    message.success('取消发布成功');
+                    query();
                   },
                 });
               }}
@@ -101,11 +103,12 @@ const PaintingList = () => {
               danger
               onClick={() => {
                 Modal.confirm({
-                  title: "删除",
-                  content: "确定删除吗？",
+                  title: '删除',
+                  content: '确定删除吗？',
                   onOk: async () => {
                     await deletePaint(record.groupId);
-                    message.success("删除成功");
+                    message.success('删除成功');
+                    query();
                   },
                 });
               }}
@@ -120,13 +123,12 @@ const PaintingList = () => {
 
   const query = () => {
     queryPaintList().then((res) => {
-      console.log(res);
       setPaintings(res);
     });
   };
 
   const handleAdd = () => {
-    setId("");
+    setId('');
     setOpen(true);
   };
 
@@ -143,7 +145,7 @@ const PaintingList = () => {
       </div>
       <Table columns={columns} pagination={false} dataSource={paintings} />
 
-      {open && <Editpainting />}
+      {open && <Editpainting query={query} />}
       {previewOpen && <PaintingPreview imgPath={previewPath} />}
     </div>
   );

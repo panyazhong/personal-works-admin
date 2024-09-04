@@ -1,3 +1,9 @@
+export enum LanguageEnum {
+  en = 'en',
+  zh = 'zh',
+  fr = 'fr',
+}
+
 export interface Article {
   author: string;
   content: string;
@@ -32,4 +38,18 @@ export interface Exhibition {
   zh: ExhibitionItem;
   en: ExhibitionItem;
   fr: ExhibitionItem;
+}
+
+export interface Paint {
+  title: string;
+  author: string;
+  imgPath: string;
+  topPosition: number;
+}
+
+export interface AddPaint {
+  [LanguageEnum.zh]: Paint | null;
+  [LanguageEnum.en]: Paint | null;
+  [LanguageEnum.fr]: Paint | null;
+  articleGroupId: number | null;
 }
