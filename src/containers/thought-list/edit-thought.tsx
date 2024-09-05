@@ -15,7 +15,7 @@ import ReactQuill from 'react-quill';
 import { tw } from 'twind';
 import { css } from 'twind/css';
 import { thoughtDetailIdAtom, thoughtOpenAtom } from '.';
-import { InboxOutlined, PlusOutlined } from '@ant-design/icons';
+import { InboxOutlined } from '@ant-design/icons';
 import { addArticle, queryArticleDetail, uploadPaint } from '../../api';
 import { Article, IThought } from '../../api/interface';
 
@@ -40,7 +40,7 @@ const EditThought = ({ query }: { query: () => void }) => {
       fd.append('file', info.file as unknown as Blob);
 
       uploadPaint(fd).then((res) => {
-        setEditInfo((prev) => {
+        setEditInfo((prev: any) => {
           return {
             ...prev,
             [language]: {

@@ -25,7 +25,7 @@ const ThoughtList = () => {
       dataIndex: 'name',
       title: '名称',
       width: '300px',
-      render: (text, record, index) => {
+      render: (_, record) => {
         return (
           <div className={tw(`truncate max-w-[300px]`)}>
             {record.zh.title || '--'}
@@ -37,8 +37,7 @@ const ThoughtList = () => {
       dataIndex: 'desc',
       title: '文章简介',
       width: 400,
-      flex: 1,
-      render: (text, record, index) => {
+      render: (_, record) => {
         return (
           <div
             className={tw``}
@@ -51,7 +50,7 @@ const ThoughtList = () => {
       dataIndex: 'opearate',
       title: '操作',
       width: 100,
-      render: (text, record, index) => {
+      render: (_, record) => {
         return (
           <div className={tw`flex gap-2`}>
             <Button

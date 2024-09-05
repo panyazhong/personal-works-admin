@@ -1,3 +1,4 @@
+import { useAtom } from 'jotai';
 import {
   Alert,
   Form,
@@ -8,8 +9,7 @@ import {
   Upload,
   UploadProps,
 } from 'antd';
-import { useAtom } from 'jotai';
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import ReactQuill from 'react-quill';
 import { tw } from 'twind';
 import { css } from 'twind/css';
