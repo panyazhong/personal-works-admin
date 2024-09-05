@@ -67,12 +67,13 @@ const PaintingList = () => {
             </Button>{' '}
             <Button
               type="dashed"
+              disabled={record.zh.isPublish}
               onClick={() => {
                 Modal.confirm({
                   title: '发布',
                   content: '确定发布吗',
                   onOk: async () => {
-                    await publishPaint(record.groupId);
+                    await publishPaint({ groupId: record.groupId });
                     message.success('发布成功');
                     query();
                   },
@@ -84,12 +85,13 @@ const PaintingList = () => {
             <Button
               type="primary"
               danger
+              disabled={!record.zh.isPublish}
               onClick={() => {
                 Modal.confirm({
                   title: '取消发布',
                   content: '确定取消发布吗？',
                   onOk: async () => {
-                    await unPublishPaint(record.groupId);
+                    await unPublishPaint({ groupId: record.groupId });
                     message.success('取消发布成功');
                     query();
                   },
@@ -106,7 +108,7 @@ const PaintingList = () => {
                   title: '删除',
                   content: '确定删除吗？',
                   onOk: async () => {
-                    await deletePaint(record.groupId);
+                    await deletePaint({ groupId: record.groupId });
                     message.success('删除成功');
                     query();
                   },

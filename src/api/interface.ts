@@ -28,16 +28,16 @@ export interface IThought {
   groupId: number;
 }
 
-type ExhibitionItem = {
+export type ExhibitionItem = {
   title: string;
   content: string;
   imgPath: string;
   author: string;
 };
 export interface Exhibition {
-  zh: ExhibitionItem;
-  en: ExhibitionItem;
-  fr: ExhibitionItem;
+  [LanguageEnum.zh]: ExhibitionItem | null;
+  [LanguageEnum.en]: ExhibitionItem | null;
+  [LanguageEnum.fr]: ExhibitionItem | null;
 }
 
 export interface Paint {

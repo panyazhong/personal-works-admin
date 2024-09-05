@@ -1,17 +1,17 @@
-import { Button, Modal, Table, TableColumnType } from "antd";
-import { tw } from "twind";
-import EditThought from "./edit-news";
-import { atom, useAtom } from "jotai";
+import { Button, message, Modal, Table, TableColumnType } from 'antd';
+import { tw } from 'twind';
+import EditThought from './edit-news';
+import { atom, useAtom } from 'jotai';
 import {
   deleteExhibition,
   publishExhibition,
   queryExhibitionList,
   unPublishExhibition,
-} from "../../api";
-import { useEffect, useState } from "react";
+} from '../../api';
+import { useEffect, useState } from 'react';
 
 export const thoughtOpenAtom = atom(false);
-export const thoughtDetailIdAtom = atom("");
+export const thoughtDetailIdAtom = atom('');
 
 const NewsList = () => {
   const [open, setOpen] = useAtom(thoughtOpenAtom);
@@ -19,8 +19,8 @@ const NewsList = () => {
 
   const columns: TableColumnType<any>[] = [
     {
-      dataIndex: "name",
-      title: "名称",
+      dataIndex: 'name',
+      title: '名称',
       render: (text, record, index) => {
         return <div className={tw`flex gap-2`}>{record.zh.title}</div>;
       },
@@ -30,8 +30,8 @@ const NewsList = () => {
     //   title: "文章简介",
     // },
     {
-      dataIndex: "opearate",
-      title: "操作",
+      dataIndex: 'opearate',
+      title: '操作',
       render: (text, record, index) => {
         return (
           <div className={tw`flex gap-2`}>
@@ -46,13 +46,15 @@ const NewsList = () => {
             </Button>
             <Button
               type="dashed"
+              disabled={record.zh.isPublish}
               onClick={() => {
                 Modal.confirm({
-                  title: "发布",
-                  content: "确定发布吗",
+                  title: '发布',
+                  content: '确定发布吗',
                   onOk: async () => {
-                    await publishExhibition(record.groupId);
-                    message.success("发布成功");
+                    await publishExhibition({ groupId: record.groupId });
+                    message.success('发布成功');
+                    query();
                   },
                 });
               }}
@@ -62,13 +64,15 @@ const NewsList = () => {
             <Button
               type="primary"
               danger
+              disabled={!record.zh.isPublish}
               onClick={() => {
                 Modal.confirm({
-                  title: "取消发布",
-                  content: "确定取消发布吗？",
+                  title: '取消发布',
+                  content: '确定取消发布吗？',
                   onOk: async () => {
-                    await unPublishExhibition(record.groupId);
-                    message.success("取消发布成功");
+                    await unPublishExhibition({ groupId: record.groupId });
+                    message.success('取消发布成功');
+                    query();
                   },
                 });
               }}
@@ -80,11 +84,12 @@ const NewsList = () => {
               danger
               onClick={() => {
                 Modal.confirm({
-                  title: "删除",
-                  content: "确定删除吗？",
+                  title: '删除',
+                  content: '确定删除吗？',
                   onOk: async () => {
-                    await deleteExhibition(record.groupId);
-                    message.success("删除成功");
+                    await deleteExhibition({ groupId: record.groupId });
+                    message.success('删除成功');
+                    query();
                   },
                 });
               }}
@@ -100,7 +105,7 @@ const NewsList = () => {
   const [newsList, setNewsList] = useState([]);
 
   const handleAdd = () => {
-    setId("");
+    setId('');
     setOpen(true);
   };
 
@@ -127,7 +132,7 @@ const NewsList = () => {
         rowKey="groupId"
       />
 
-      {open && <EditThought />}
+      {open && <EditThought query={query} />}
     </div>
   );
 };

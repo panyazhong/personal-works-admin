@@ -7,95 +7,106 @@ import {
   Radio,
   Upload,
   UploadProps,
-} from "antd";
-import { useAtom } from "jotai";
-import { useEffect, useRef, useState } from "react";
-import ReactQuill from "react-quill";
-import { tw } from "twind";
-import { css } from "twind/css";
-import { thoughtDetailIdAtom, thoughtOpenAtom } from ".";
-import { InboxOutlined } from "@ant-design/icons";
-import { Exhibition } from "../../api/interface";
+} from 'antd';
+import { useAtom } from 'jotai';
+import { FC, useEffect, useRef, useState } from 'react';
+import ReactQuill from 'react-quill';
+import { tw } from 'twind';
+import { css } from 'twind/css';
+import { thoughtDetailIdAtom, thoughtOpenAtom } from '.';
+import { InboxOutlined } from '@ant-design/icons';
+import { Exhibition, LanguageEnum } from '../../api/interface';
+import { useUpdateEffect } from 'ahooks';
+import { addExhibition, uploadPaint } from '../../api';
 
 const { Item } = Form;
 const { Dragger } = Upload;
 
-const initForm = ["zh", "en", "fr"].map((i) => ({
-  language: i,
-  title: null,
-  content: "",
-  author: "",
-  imgPath: "",
-}));
+const init = {
+  [LanguageEnum.zh]: null,
+  [LanguageEnum.en]: null,
+  [LanguageEnum.fr]: null,
+};
 
-const init = {};
-
-initForm.forEach((i) => {
-  init[i.language] = i;
-});
-
-const EditThought = () => {
+const EditThought: FC<{ query: () => void }> = (props) => {
   const [open, setOpen] = useAtom(thoughtOpenAtom);
   const [id] = useAtom(thoughtDetailIdAtom);
-  const language = useRef<string>("zh");
-
-  const [value, setValue] = useState("");
+  const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.zh);
   const [operateInfo, setOperateInfo] = useState<Exhibition>(init);
 
   const [form] = Form.useForm();
 
-  const props: UploadProps = {
-    name: "file",
-    multiple: true,
-    action: "https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload",
+  const upProps: UploadProps = {
+    beforeUpload: () => false,
     onChange(info) {
-      const { status } = info.file;
-      if (status !== "uploading") {
-        console.log(info.file, info.fileList);
-      }
-      if (status === "done") {
-        message.success(`${info.file.name} file uploaded successfully.`);
-      } else if (status === "error") {
-        message.error(`${info.file.name} file upload failed.`);
-      }
+      const fd = new FormData();
+      fd.append('file', info.file as unknown as Blob);
+
+      uploadPaint(fd).then((res) => {
+        setOperateInfo((prev) => {
+          return {
+            ...prev,
+            [language]: {
+              ...prev[language],
+              imgPath: res,
+            },
+          };
+        });
+      });
     },
     onDrop(e) {
-      console.log("Dropped files", e.dataTransfer.files);
+      console.log('Dropped files', e.dataTransfer.files);
     },
   };
 
-  const title = id ? "编辑" : "新增";
+  const title = id ? '编辑' : '新增';
 
   const click = async () => {
-    const valids = await form.validateFields();
-    if (!value) {
-      return;
+    try {
+      const valids = await form.validateFields();
+
+      const params = {
+        ...operateInfo,
+        [language]: {
+          ...operateInfo[language],
+          ...valids,
+        },
+      };
+
+      await addExhibition(params);
+
+      message.success('操作成功');
+
+      props.query();
+      setOpen(false);
+    } catch (error) {
+      message.error('操作失败');
     }
-    console.log(valids);
   };
 
-  const handleValusChange = (val) => {
+  const handleValusChange = (val: Exhibition[LanguageEnum.zh]) => {
     setOperateInfo((prev) => {
       return {
         ...prev,
-        [language.current]: {
-          ...prev[language.current],
-
+        [language]: {
+          ...prev[language],
           ...val,
         },
       };
     });
   };
 
-  const handleOk = async () => {
-    console.log(operateInfo);
-  };
-
+  /**-------------------effects---------------- */
   useEffect(() => {
     if (open) {
-      form.setFieldsValue(init[language.current]);
+      form.setFieldsValue(init[language]);
     }
   }, [open]);
+
+  useUpdateEffect(() => {
+    console.log(operateInfo[language]);
+    form.setFieldsValue(operateInfo[language] || { title: '', author: '' });
+  }, [language]);
 
   return (
     <Modal
@@ -103,7 +114,7 @@ const EditThought = () => {
       open={open}
       title={title}
       width={800}
-      onOk={handleOk}
+      onOk={click}
       onClose={() => {
         setOpen(false);
       }}
@@ -137,30 +148,31 @@ const EditThought = () => {
             `}
           `}
       >
-        <Item label="请选择语言" name="language">
+        <Item label="请选择语言">
           <Radio.Group
+            value={language}
             onChange={(e) => {
-              language.current = e.target.value;
+              setLanguage(e.target.value as LanguageEnum);
 
-              form.setFieldsValue(operateInfo[language.current]);
+              form.setFieldsValue(operateInfo[language]);
             }}
           >
-            <Radio value={"zh"}>中文</Radio>
-            <Radio value={"en"}>英文</Radio>
-            <Radio value={"fr"}>法语</Radio>
+            <Radio value={LanguageEnum.zh}>中文</Radio>
+            <Radio value={LanguageEnum.en}>英文</Radio>
+            <Radio value={LanguageEnum.fr}>法语</Radio>
           </Radio.Group>
         </Item>
         <Item
-          label="文章标题"
+          label="展讯标题"
           name="title"
           rules={[
             {
               required: true,
-              message: "请填写文章标题",
+              message: '请填写展讯标题',
             },
           ]}
         >
-          <Input placeholder="文章标题" />
+          <Input placeholder="展讯标题" />
         </Item>
         <Item
           label="作者"
@@ -168,23 +180,23 @@ const EditThought = () => {
           rules={[
             {
               required: true,
-              message: "请填写文章标题",
+              message: '请填写展讯标题',
             },
           ]}
         >
-          <Input placeholder="文章标题" />
+          <Input placeholder="展讯标题" />
         </Item>
         <Item
           label="封面上传"
-          name="imgPath"
+          // name="imgPath"
           rules={[
             {
               required: true,
-              message: "请填写文章简介",
+              message: '请上传封面',
             },
           ]}
         >
-          <Dragger {...props}>
+          <Dragger {...upProps}>
             <p className="ant-upload-drag-icon">
               <InboxOutlined />
             </p>
@@ -198,37 +210,37 @@ const EditThought = () => {
           </Dragger>
         </Item>
         <Item
-          label="文章内容"
+          label="展讯内容"
           className={tw`text-frc-300`}
           rules={[
             {
               required: true,
-              message: "请填写文章内容",
+              message: '请填写展讯内容',
             },
           ]}
         >
           <ReactQuill
             style={{
-              height: "500px",
+              height: '500px',
             }}
             theme="snow"
-            value={operateInfo[language.current].content}
+            value={operateInfo[language]?.content}
             onChange={(val) => {
               handleValusChange({
-                ...operateInfo[language.current],
+                ...operateInfo[language],
                 content: val,
-              });
+              } as Exhibition[LanguageEnum.zh]);
             }}
             modules={{
               toolbar: [
-                ["bold", "italic", "underline", "strike"], // toggled buttons
-                ["blockquote", "code-block"],
+                ['bold', 'italic', 'underline', 'strike'], // toggled buttons
+                ['blockquote', 'code-block'],
 
                 // 1, 2, false] }],
-                [{ list: "ordered" }, { list: "bullet" }],
-                [{ script: "sub" }, { script: "super" }],
-                [{ indent: "-1" }, { indent: "+1" }], // outdent/indent
-                [{ direction: "rtl" }], // text direction
+                [{ list: 'ordered' }, { list: 'bullet' }],
+                [{ script: 'sub' }, { script: 'super' }],
+                [{ indent: '-1' }, { indent: '+1' }], // outdent/indent
+                [{ direction: 'rtl' }], // text direction
 
                 // [{ size: ["small", false, "large", "huge"] }], // custom dropdown
                 [{ header: [1, 2, 3, 4, 5, 6, false] }],
@@ -239,7 +251,7 @@ const EditThought = () => {
 
                 // ["clean"], // remove formatting button
 
-                ["link", "image", "video"], // link and image, video
+                ['link', 'image', 'video'], // link and image, video
               ],
             }}
           />

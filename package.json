@@ -12,11 +12,12 @@
   "dependencies": {
     "@ant-design/icons": "^5.4.0",
     "@types/node": "^20.14.11",
-    "ahooks": "^3.8.0",
+    "ahooks": "^3.8.1",
     "antd": "^5.19.3",
     "axios": "^1.7.2",
     "dayjs": "^1.11.12",
     "jotai": "^2.9.1",
+    "lodash": "^4.17.21",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-quill": "^2.0.0",
@@ -26,6 +27,7 @@
     "twind": "^0.16.19"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.7",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^7.15.0",

@@ -1,5 +1,5 @@
 import axios from './httpRequest';
-import { AddPaint, IThought } from './interface';
+import { AddPaint, Exhibition, IThought } from './interface';
 
 const login = (data: {
   username: string;
@@ -63,6 +63,17 @@ const unPublishArticle = (data: { groupId: string }) => {
   return axios
     .request({
       url: '/article/unPublish',
+      method: 'post',
+      data,
+    })
+    .then((res) => {
+      return res.data;
+    });
+};
+const addArticle = (data: any) => {
+  return axios
+    .request({
+      url: '/article/add',
       method: 'post',
       data,
     })
@@ -156,7 +167,7 @@ const uploadPaint = (data: any) => {
 };
 
 /** ----------------------news-------------------------- */
-const addExhibition = (data: any) => {
+const addExhibition = (data: Exhibition) => {
   return axios
     .request({
       url: '/exhibition/add',
@@ -165,6 +176,9 @@ const addExhibition = (data: any) => {
     })
     .then((res) => {
       return res.data;
+    })
+    .catch((err) => {
+      return Promise.reject(err);
     });
 };
 const queryExhibitionList = () => {
@@ -221,6 +235,7 @@ const unPublishExhibition = (data: { groupId: string }) => {
       return res.data;
     });
 };
+
 export {
   login,
   // article
@@ -229,6 +244,7 @@ export {
   deleteArticle,
   publishArticle,
   unPublishArticle,
+  addArticle,
   // paint
   queryPaintList,
   queryPaintDetail,
