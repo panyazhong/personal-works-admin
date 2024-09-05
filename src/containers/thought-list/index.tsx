@@ -53,7 +53,7 @@ const ThoughtList = () => {
       render: (_, record) => {
         return (
           <div className={tw`flex gap-2`}>
-            <Button
+            {/* <Button
               type="primary"
               onClick={() => {
                 setOpen(true);
@@ -61,7 +61,7 @@ const ThoughtList = () => {
               }}
             >
               编辑
-            </Button>
+            </Button> */}
             <Button
               type="dashed"
               disabled={record.zh.isPublish}

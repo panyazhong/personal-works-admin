@@ -56,7 +56,7 @@ const PaintingList = () => {
             >
               查看图片
             </Button>
-            <Button
+            {/* <Button
               type="primary"
               onClick={() => {
                 setOpen(true);
@@ -64,7 +64,7 @@ const PaintingList = () => {
               }}
             >
               编辑
-            </Button>{' '}
+            </Button>{' '} */}
             <Button
               type="dashed"
               disabled={record.zh.isPublish}
