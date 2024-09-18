@@ -27,7 +27,7 @@ const PaintingList = () => {
     {
       dataIndex: 'name',
       title: '名称',
-      render: (text, record, index) => {
+      render: (_, record) => {
         return (
           <div
             className={tw`cursor-pointer`}
@@ -44,7 +44,7 @@ const PaintingList = () => {
     {
       dataIndex: 'opearate',
       title: '操作',
-      render: (text, record, index) => {
+      render: (_, record) => {
         return (
           <div className={tw`flex gap-2`}>
             <Button

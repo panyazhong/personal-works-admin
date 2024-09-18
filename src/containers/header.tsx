@@ -1,12 +1,12 @@
-import { Drawer, Menu, MenuProps } from "antd";
-import { useAtom } from "jotai";
-import { useLocation, useNavigate } from "react-router-dom";
-import { tw } from "twind";
-import { localeAtom } from "../models/store";
-import { MenuOutlined } from "@ant-design/icons";
-import { useMemo, useState } from "react";
-import { css } from "twind/css";
-import { ItemType } from "antd/es/menu/interface";
+import { Drawer, Menu, MenuProps } from 'antd';
+import { useAtom } from 'jotai';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { tw } from 'twind';
+import { localeAtom } from '../models/store';
+import { MenuOutlined } from '@ant-design/icons';
+import { useMemo, useState } from 'react';
+import { css } from 'twind/css';
+import { ItemType } from 'antd/es/menu/interface';
 
 // import en from "@/assets/en.svg";
 // import zh from "@/assets/zh.svg";
@@ -22,35 +22,35 @@ const Header = () => {
   const Menus = [
     {
       label: {
-        zh: "首页",
-        en: "Homepage",
-        fr: "Page d’acceuil",
+        zh: '首页',
+        en: 'Homepage',
+        fr: 'Page d’acceuil',
       },
-      path: "/",
+      path: '/',
     },
     {
       label: {
-        zh: "思想作品集",
-        en: "About the Artist",
-        fr: "A propos de l’Artiste",
+        zh: '思想作品集',
+        en: 'About the Artist',
+        fr: 'A propos de l’Artiste',
       },
-      path: "/thought-list",
+      path: '/thought-list',
     },
     {
       label: {
-        zh: "艺术作品集",
-        en: "Artistic Works",
-        fr: "Œuvres d’art",
+        zh: '艺术作品集',
+        en: 'Artistic Works',
+        fr: 'Œuvres d’art',
       },
-      path: "/painting-list",
+      path: '/painting-list',
     },
     {
       label: {
-        zh: "展讯集",
-        en: "UAFC Union",
-        fr: "Union UAFC",
+        zh: '展讯集',
+        en: 'UAFC Union',
+        fr: 'Union UAFC',
       },
-      path: "/news-list",
+      path: '/news-list',
     },
     // {
     //   label: {
@@ -96,12 +96,12 @@ const Header = () => {
 
   const navigate = useNavigate();
   // const location = useLocation();
-  const [locale, setLocale] = useAtom(localeAtom);
+  const [locale] = useAtom(localeAtom);
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
 
   console.log(pathname);
-  const items: MenuProps["items"] = useMemo(() => {
+  const items: MenuProps['items'] = useMemo(() => {
     const res = Menus.map((menu) => {
       return {
         label: menu.label[locale],
@@ -112,42 +112,42 @@ const Header = () => {
     return res;
     return [
       {
-        label: "....",
-        key: "mail",
+        label: '....',
+        key: 'mail',
       },
       {
-        label: "Navigation Two",
-        key: "app",
+        label: 'Navigation Two',
+        key: 'app',
       },
       {
-        label: "Navigation Three - Submenu",
-        key: "SubMenu",
+        label: 'Navigation Three - Submenu',
+        key: 'SubMenu',
         children: [
           {
-            type: "group",
-            label: "Item 1",
+            type: 'group',
+            label: 'Item 1',
             children: [
               {
-                label: "Option 1",
-                key: "setting:1",
+                label: 'Option 1',
+                key: 'setting:1',
               },
               {
-                label: "Option 2",
-                key: "setting:2",
+                label: 'Option 2',
+                key: 'setting:2',
               },
             ],
           },
           {
-            type: "group",
-            label: "Item 2",
+            type: 'group',
+            label: 'Item 2',
             children: [
               {
-                label: "Option 3",
-                key: "setting:3",
+                label: 'Option 3',
+                key: 'setting:3',
               },
               {
-                label: "Option 4",
-                key: "setting:4",
+                label: 'Option 4',
+                key: 'setting:4',
               },
             ],
           },
@@ -163,7 +163,7 @@ const Header = () => {
             Navigation Four - Link
           </a>
         ),
-        key: "alipay",
+        key: 'alipay',
       },
     ];
   }, [locale]);
@@ -178,27 +178,27 @@ const Header = () => {
   };
 
   const logout = () => {
-    navigate("/login");
+    navigate('/login');
   };
 
-  const color = useMemo(() => {
-    if (pathname === "/studio-info") {
-      return {
-        normal: "#fff",
-        active: "#191B1C",
-      };
-    }
-    return {
-      normal: "#191B1C",
-      active: "#fff",
-    };
-  }, [pathname]);
+  // const color = useMemo(() => {
+  //   if (pathname === "/studio-info") {
+  //     return {
+  //       normal: "#fff",
+  //       active: "#191B1C",
+  //     };
+  //   }
+  //   return {
+  //     normal: "#191B1C",
+  //     active: "#fff",
+  //   };
+  // }, [pathname]);
 
   return (
     <div
       className={tw`flex h-[72px] justify-between items-center text-sm px-2 ${
-        pathname === "/studio-info" ? "text-frc-50" : "text-frc-100"
-      } ${pathname === "/studio-info" ? "ant-studio" : ""}`}
+        pathname === '/studio-info' ? 'text-frc-50' : 'text-frc-100'
+      } ${pathname === '/studio-info' ? 'ant-studio' : ''}`}
     >
       <div className={tw`flex items-center w-full`}>
         <div
@@ -334,8 +334,8 @@ const Header = () => {
         closable={false}
         onClose={onClose}
         open={open}
-        key={"top"}
-        getContainer={document.getElementById("root") as HTMLDivElement}
+        key={'top'}
+        getContainer={document.getElementById('root') as HTMLDivElement}
         className={tw`bg-frc-50 text-frc-100 ${css``}`}
       >
         <div className={tw`flex flex-col items-center`}>

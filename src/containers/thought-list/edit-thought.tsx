@@ -234,7 +234,7 @@ const EditThought = ({ query }: { query: () => void }) => {
               (editInfo?.[language as keyof IThought] as Article)?.content || ''
             }
             onChange={(val) => {
-              setEditInfo((prev) => {
+              setEditInfo((prev: any) => {
                 if (!prev) {
                   return {} as IThought;
                 }

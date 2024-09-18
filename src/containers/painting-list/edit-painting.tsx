@@ -126,7 +126,7 @@ const EditThought: FC<IProps> = (props) => {
       <Form
         layout="vertical"
         form={form}
-        onValuesChange={(cVal, vals) => {
+        onValuesChange={(_, vals) => {
           setEditInfo((prev) => {
             return {
               ...prev,

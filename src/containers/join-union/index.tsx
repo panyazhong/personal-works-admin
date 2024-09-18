@@ -1,16 +1,14 @@
-import { InboxOutlined } from "@ant-design/icons";
-import { Button, Form, Input, Upload, message } from "antd";
-import { tw } from "twind";
-import { css } from "twind/css";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
-import { useState } from "react";
+import { Button, Form, Input } from 'antd';
+import { tw } from 'twind';
+import { css } from 'twind/css';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import { useState } from 'react';
 
 const { Item } = Form;
-const { Dragger } = Upload;
 
 const JoinUnion = () => {
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState('');
   const [form] = Form.useForm();
 
   const click = async () => {
@@ -43,7 +41,7 @@ const JoinUnion = () => {
             rules={[
               {
                 required: true,
-                message: "请填写文章标题",
+                message: '请填写文章标题',
               },
             ]}
           >
@@ -55,7 +53,7 @@ const JoinUnion = () => {
             rules={[
               {
                 required: true,
-                message: "请填写文章简介",
+                message: '请填写文章简介',
               },
             ]}
           >
@@ -67,27 +65,27 @@ const JoinUnion = () => {
             rules={[
               {
                 required: true,
-                message: "请填写文章内容",
+                message: '请填写文章内容',
               },
             ]}
           >
             <ReactQuill
               style={{
-                height: "800px",
+                height: '800px',
               }}
               theme="snow"
               value={value}
               onChange={setValue}
               modules={{
                 toolbar: [
-                  ["bold", "italic", "underline", "strike"], // toggled buttons
-                  ["blockquote", "code-block"],
+                  ['bold', 'italic', 'underline', 'strike'], // toggled buttons
+                  ['blockquote', 'code-block'],
 
                   // [{ header: [1, 2, false] }],
-                  [{ list: "ordered" }, { list: "bullet" }],
-                  [{ script: "sub" }, { script: "super" }],
-                  [{ indent: "-1" }, { indent: "+1" }], // outdent/indent
-                  [{ direction: "rtl" }], // text direction
+                  [{ list: 'ordered' }, { list: 'bullet' }],
+                  [{ script: 'sub' }, { script: 'super' }],
+                  [{ indent: '-1' }, { indent: '+1' }], // outdent/indent
+                  [{ direction: 'rtl' }], // text direction
 
                   // [{ size: ["small", false, "large", "huge"] }], // custom dropdown
                   [{ header: [1, 2, 3, 4, 5, 6, false] }],
@@ -98,7 +96,7 @@ const JoinUnion = () => {
 
                   // ["clean"], // remove formatting button
 
-                  ["link", "image", "video"], // link and image, video
+                  ['link', 'image', 'video'], // link and image, video
                 ],
               }}
             />

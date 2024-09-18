@@ -133,7 +133,7 @@ const EditThought: FC<{ query: () => void }> = (props) => {
       <Form
         layout="vertical"
         form={form}
-        onValuesChange={(cvals, vals) => {
+        onValuesChange={(_, vals) => {
           handleValusChange(vals);
         }}
         className={tw`

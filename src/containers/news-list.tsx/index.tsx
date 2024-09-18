@@ -21,7 +21,7 @@ const NewsList = () => {
     {
       dataIndex: 'name',
       title: '名称',
-      render: (text, record, index) => {
+      render: (_, record) => {
         return <div className={tw`flex gap-2`}>{record.zh.title}</div>;
       },
     },
@@ -32,7 +32,7 @@ const NewsList = () => {
     {
       dataIndex: 'opearate',
       title: '操作',
-      render: (text, record, index) => {
+      render: (_, record) => {
         return (
           <div className={tw`flex gap-2`}>
             {/* <Button
