@@ -9,7 +9,6 @@ import {
   queryArticleList,
   unPublishArticle,
 } from '../../api';
-import { IThought } from '../../api/interface';
 import { useUpdateEffect } from 'ahooks';
 
 export const thoughtOpenAtom = atom(false);
@@ -31,8 +30,8 @@ const ThoughtList = () => {
   const [, setId] = useAtom(thoughtDetailIdAtom);
   const [filters, setFilters] = useState<any>('all');
 
-  const [tableData, setTableData] = useState<IThought[]>([]);
-  const [displayList, setDislayList] = useState([]);
+  const [tableData, setTableData] = useState<any[]>([]);
+  const [displayList, setDislayList] = useState<any[]>([]);
 
   const columns: TableColumnType<any>[] = [
     {
@@ -146,7 +145,7 @@ const ThoughtList = () => {
 
     setTableData(res);
     setDislayList(
-      (res || []).filter((i) =>
+      ((res || []) as any[]).filter((i: any) =>
         filters === 'all' ? !i.zh?.isDeleted : i.zh?.isDeleted,
       ),
     );
@@ -158,7 +157,7 @@ const ThoughtList = () => {
 
   useUpdateEffect(() => {
     setDislayList(
-      (tableData || []).filter((i) =>
+      ((tableData || []) as any[]).filter((i: any) =>
         filters === 'all' ? !i.zh?.isDeleted : i.zh?.isDeleted,
       ),
     );

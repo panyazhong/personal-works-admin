@@ -1,12 +1,4 @@
-import {
-  Button,
-  Checkbox,
-  message,
-  Modal,
-  Table,
-  TableColumnType,
-  Tabs,
-} from 'antd';
+import { Button, message, Modal, Table, TableColumnType, Tabs } from 'antd';
 import { tw } from 'twind';
 import EditThought from './edit-news';
 import { atom, useAtom } from 'jotai';
@@ -16,7 +8,7 @@ import {
   queryExhibitionList,
   unPublishExhibition,
 } from '../../api';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useUpdateEffect } from 'ahooks';
 
 export const thoughtOpenAtom = atom(false);
@@ -137,7 +129,7 @@ const NewsList = () => {
     setNewsList(res);
 
     setDislayList(
-      (res || []).filter((i) =>
+      (res || []).filter((i: any) =>
         filters === 'all' ? !i.zh?.isDeleted : i.zh?.isDeleted,
       ),
     );
@@ -149,7 +141,7 @@ const NewsList = () => {
 
   useUpdateEffect(() => {
     setDislayList(
-      (newsList || []).filter((i) =>
+      (newsList || []).filter((i: any) =>
         filters === 'all' ? !i.zh?.isDeleted : i.zh?.isDeleted,
       ),
     );

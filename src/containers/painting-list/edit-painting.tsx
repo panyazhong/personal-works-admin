@@ -12,7 +12,7 @@ import {
   UploadProps,
 } from 'antd';
 import { useAtom } from 'jotai';
-import { FC, useEffect, useState } from 'react';
+import { FC, useState } from 'react';
 import { tw } from 'twind';
 import { css } from 'twind/css';
 import { thoughtDetailIdAtom, paintingOpenAtom } from '.';

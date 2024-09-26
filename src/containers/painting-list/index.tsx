@@ -142,7 +142,7 @@ const PaintingList = () => {
     queryPaintList().then((res) => {
       setPaintings(res);
       setDislayList(
-        (res || []).filter((i) =>
+        (res || []).filter((i: any) =>
           filters === 'all' ? !i.zh?.isDeleted : i.zh?.isDeleted,
         ),
       );
@@ -160,7 +160,7 @@ const PaintingList = () => {
 
   useUpdateEffect(() => {
     setDislayList(
-      (paintings || []).filter((i) =>
+      (paintings || []).filter((i: any) =>
         filters === 'all' ? !i.zh?.isDeleted : i.zh?.isDeleted,
       ),
     );
