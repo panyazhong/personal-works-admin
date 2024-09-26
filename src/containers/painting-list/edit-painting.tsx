@@ -17,10 +17,10 @@ import { tw } from 'twind';
 import { css } from 'twind/css';
 import { thoughtDetailIdAtom, paintingOpenAtom } from '.';
 import { InboxOutlined } from '@ant-design/icons';
-import { addPaint, uploadPaint } from '../../api';
-import { useUpdateEffect } from 'ahooks';
+import { addPaint, queryArticleList, uploadPaint } from '../../api';
+import { useAsyncEffect, useUpdateEffect } from 'ahooks';
 import { isNil } from 'lodash';
-import { AddPaint, LanguageEnum } from '../../api/interface';
+import { AddPaint, IThought, LanguageEnum } from '../../api/interface';
 
 const { Item } = Form;
 const { Dragger } = Upload;
@@ -35,6 +35,7 @@ const EditThought: FC<IProps> = (props) => {
 
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.zh);
   const [isRelated, setIsRelated] = useState<boolean>(false);
+  const [articleList, setArticleList] = useState<IThought[]>([]);
   const [editInfo, setEditInfo] = useState<AddPaint>({
     zh: null,
     en: null,
@@ -94,7 +95,13 @@ const EditThought: FC<IProps> = (props) => {
 
   /** -----------------effects---------------------- */
 
-  useEffect(() => {}, []);
+  useAsyncEffect(async () => {
+    if (open) {
+      const res = await queryArticleList();
+      console.log(res);
+      setArticleList(res);
+    }
+  }, [open]);
 
   useUpdateEffect(() => {
     form.setFieldsValue(editInfo[language]);
@@ -220,7 +227,12 @@ const EditThought: FC<IProps> = (props) => {
         </Checkbox>
         {isRelated && (
           <Item label="关联文章">
-            <Select options={[]} />
+            <Select
+              options={articleList.map((i) => ({
+                label: i.zh?.title,
+                value: i.groupId,
+              }))}
+            />
           </Item>
         )}
         <Item

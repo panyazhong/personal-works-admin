@@ -1,4 +1,4 @@
-import { Button, message, Modal, Table, TableColumnType } from 'antd';
+import { Button, message, Modal, Table, TableColumnType, Tabs } from 'antd';
 import { tw } from 'twind';
 import EditThought from './edit-thought';
 import { atom, useAtom } from 'jotai';
@@ -10,15 +10,29 @@ import {
   unPublishArticle,
 } from '../../api';
 import { IThought } from '../../api/interface';
+import { useUpdateEffect } from 'ahooks';
 
 export const thoughtOpenAtom = atom(false);
 export const thoughtDetailIdAtom = atom('');
 
+const Options = [
+  {
+    label: '未删除',
+    value: 'all',
+  },
+  {
+    label: '已删除',
+    value: 'isDelete',
+  },
+];
+
 const ThoughtList = () => {
   const [open, setOpen] = useAtom(thoughtOpenAtom);
   const [, setId] = useAtom(thoughtDetailIdAtom);
+  const [filters, setFilters] = useState<any>('all');
 
   const [tableData, setTableData] = useState<IThought[]>([]);
+  const [displayList, setDislayList] = useState([]);
 
   const columns: TableColumnType<any>[] = [
     {
@@ -51,6 +65,7 @@ const ThoughtList = () => {
       title: '操作',
       width: 100,
       render: (_, record) => {
+        if (record.zh?.isDeleted) return '已删除';
         return (
           <div className={tw`flex gap-2`}>
             {/* <Button
@@ -130,11 +145,24 @@ const ThoughtList = () => {
     const res = await queryArticleList();
 
     setTableData(res);
+    setDislayList(
+      (res || []).filter((i) =>
+        filters === 'all' ? !i.zh?.isDeleted : i.zh?.isDeleted,
+      ),
+    );
   };
 
   useEffect(() => {
     getThoughtList();
   }, []);
+
+  useUpdateEffect(() => {
+    setDislayList(
+      (tableData || []).filter((i) =>
+        filters === 'all' ? !i.zh?.isDeleted : i.zh?.isDeleted,
+      ),
+    );
+  }, [filters]);
 
   return (
     <div>
@@ -142,14 +170,18 @@ const ThoughtList = () => {
         <Button onClick={handleAdd} type="primary">
           新增
         </Button>
-      </div>
+      </div>{' '}
+      <Tabs onChange={(val) => setFilters(val)} activeKey={filters}>
+        {Options.map((i) => (
+          <Tabs.TabPane tab={i.label} key={i.value} />
+        ))}
+      </Tabs>
       <Table
         columns={columns}
         pagination={false}
-        dataSource={tableData}
+        dataSource={displayList}
         rowKey={(record) => record.groupId}
       />
-
       {open && <EditThought query={getThoughtList} />}
     </div>
   );

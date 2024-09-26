@@ -1,4 +1,12 @@
-import { Button, message, Modal, Table, TableColumnType } from 'antd';
+import {
+  Button,
+  Checkbox,
+  message,
+  Modal,
+  Table,
+  TableColumnType,
+  Tabs,
+} from 'antd';
 import { tw } from 'twind';
 import EditThought from './edit-news';
 import { atom, useAtom } from 'jotai';
@@ -8,14 +16,27 @@ import {
   queryExhibitionList,
   unPublishExhibition,
 } from '../../api';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useUpdateEffect } from 'ahooks';
 
 export const thoughtOpenAtom = atom(false);
 export const thoughtDetailIdAtom = atom('');
 
+const Options = [
+  {
+    label: '未删除',
+    value: 'all',
+  },
+  {
+    label: '已删除',
+    value: 'isDelete',
+  },
+];
+
 const NewsList = () => {
   const [open, setOpen] = useAtom(thoughtOpenAtom);
   const [, setId] = useAtom(thoughtDetailIdAtom);
+  const [filters, setFilters] = useState<any>('all');
 
   const columns: TableColumnType<any>[] = [
     {
@@ -33,6 +54,7 @@ const NewsList = () => {
       dataIndex: 'opearate',
       title: '操作',
       render: (_, record) => {
+        if (record.zh?.isDeleted) return '已删除';
         return (
           <div className={tw`flex gap-2`}>
             {/* <Button
@@ -103,6 +125,7 @@ const NewsList = () => {
   ];
 
   const [newsList, setNewsList] = useState([]);
+  const [displayList, setDislayList] = useState([]);
 
   const handleAdd = () => {
     setId('');
@@ -112,11 +135,25 @@ const NewsList = () => {
   const query = async () => {
     const res = await queryExhibitionList();
     setNewsList(res);
+
+    setDislayList(
+      (res || []).filter((i) =>
+        filters === 'all' ? !i.zh?.isDeleted : i.zh?.isDeleted,
+      ),
+    );
   };
 
   useEffect(() => {
     query();
   }, []);
+
+  useUpdateEffect(() => {
+    setDislayList(
+      (newsList || []).filter((i) =>
+        filters === 'all' ? !i.zh?.isDeleted : i.zh?.isDeleted,
+      ),
+    );
+  }, [filters]);
 
   return (
     <div>
@@ -125,10 +162,16 @@ const NewsList = () => {
           新增
         </Button>
       </div>
+
+      <Tabs onChange={(val) => setFilters(val)} activeKey={filters}>
+        {Options.map((i) => (
+          <Tabs.TabPane tab={i.label} key={i.value} />
+        ))}
+      </Tabs>
       <Table
         columns={columns}
         pagination={false}
-        dataSource={newsList}
+        dataSource={displayList}
         rowKey="groupId"
       />
 

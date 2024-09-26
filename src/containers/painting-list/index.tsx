@@ -1,4 +1,4 @@
-import { Button, message, Modal, Table, TableColumnType } from 'antd';
+import { Button, message, Modal, Table, TableColumnType, Tabs } from 'antd';
 import { tw } from 'twind';
 import Editpainting from './edit-painting';
 import { atom, useAtom } from 'jotai';
@@ -10,17 +10,31 @@ import {
   unPublishPaint,
 } from '../../api';
 import { useEffect, useState } from 'react';
+import { useUpdateEffect } from 'ahooks';
 
 export const paintingOpenAtom = atom(false);
 export const previewOpenAtom = atom(false);
 export const thoughtDetailIdAtom = atom('');
 
+const Options = [
+  {
+    label: '未删除',
+    value: 'all',
+  },
+  {
+    label: '已删除',
+    value: 'isDelete',
+  },
+];
+
 const PaintingList = () => {
   const [open, setOpen] = useAtom(paintingOpenAtom);
   const [previewOpen, setPreviewOpen] = useAtom(previewOpenAtom);
   const [, setId] = useAtom(thoughtDetailIdAtom);
+  const [filters, setFilters] = useState<any>('all');
 
   const [paintings, setPaintings] = useState([]);
+  const [displayList, setDislayList] = useState([]);
   const [previewPath, setPreviewPath] = useState('');
 
   const columns: TableColumnType<any>[] = [
@@ -45,6 +59,7 @@ const PaintingList = () => {
       dataIndex: 'opearate',
       title: '操作',
       render: (_, record) => {
+        if (record?.zh?.isDeleted) return '已删除';
         return (
           <div className={tw`flex gap-2`}>
             <Button
@@ -126,6 +141,11 @@ const PaintingList = () => {
   const query = () => {
     queryPaintList().then((res) => {
       setPaintings(res);
+      setDislayList(
+        (res || []).filter((i) =>
+          filters === 'all' ? !i.zh?.isDeleted : i.zh?.isDeleted,
+        ),
+      );
     });
   };
 
@@ -138,15 +158,27 @@ const PaintingList = () => {
     query();
   }, []);
 
+  useUpdateEffect(() => {
+    setDislayList(
+      (paintings || []).filter((i) =>
+        filters === 'all' ? !i.zh?.isDeleted : i.zh?.isDeleted,
+      ),
+    );
+  }, [filters]);
+
   return (
     <div>
       <div className={tw`mb-2`}>
         <Button onClick={handleAdd} type="primary">
           新增
         </Button>
-      </div>
-      <Table columns={columns} pagination={false} dataSource={paintings} />
-
+      </div>{' '}
+      <Tabs onChange={(val) => setFilters(val)} activeKey={filters}>
+        {Options.map((i) => (
+          <Tabs.TabPane tab={i.label} key={i.value} />
+        ))}
+      </Tabs>
+      <Table columns={columns} pagination={false} dataSource={displayList} />
       {open && <Editpainting query={query} />}
       {previewOpen && <PaintingPreview imgPath={previewPath} />}
     </div>
