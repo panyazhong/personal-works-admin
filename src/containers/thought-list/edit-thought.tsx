@@ -1,5 +1,6 @@
 import {
   Alert,
+  Button,
   Form,
   Image,
   Input,
@@ -119,6 +120,18 @@ const EditThought = ({ query }: { query: () => void }) => {
           }
         `}
       `}
+      footer={
+        <>
+          {id ? null : (
+            <>
+              <Button onClick={() => setOpen(false)}>取消</Button>
+              <Button onClick={click} type="primary">
+                确认
+              </Button>
+            </>
+          )}
+        </>
+      }
     >
       <Alert message="三种语言版本需要分别提交保存！！！" banner />
       <Form

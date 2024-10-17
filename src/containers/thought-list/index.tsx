@@ -67,15 +67,15 @@ const ThoughtList = () => {
         if (record.zh?.isDeleted) return '已删除';
         return (
           <div className={tw`flex gap-2`}>
-            {/* <Button
+            <Button
               type="primary"
               onClick={() => {
                 setOpen(true);
                 setId(record.zh.groupId);
               }}
             >
-              编辑
-            </Button> */}
+              查看
+            </Button>
             <Button
               type="dashed"
               disabled={record.zh.isPublish}
