@@ -1,46 +1,46 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import { createHashRouter, RouterProvider } from "react-router-dom";
-import App from "./App.tsx";
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { createHashRouter, Navigate, RouterProvider } from 'react-router-dom';
+import App from './App.tsx';
 
-import JoinUnion from "./containers/join-union/index.tsx";
+import JoinUnion from './containers/join-union/index.tsx';
 
-import "./index.css";
-import Login from "./login/index.tsx";
-import ThoughtList from "./containers/thought-list/index.tsx";
-import NewsList from "./containers/news-list.tsx/index.tsx";
-import PaintingList from "./containers/painting-list/index.tsx";
+import './index.css';
+import Login from './login/index.tsx';
+import ThoughtList from './containers/thought-list/index.tsx';
+import NewsList from './containers/news-list.tsx/index.tsx';
+import PaintingList from './containers/painting-list/index.tsx';
 const router = createHashRouter([
   {
-    path: "/",
+    path: '/',
     element: <App />,
     children: [
       {
-        path: "/join-union",
+        path: '/join-union',
         element: <JoinUnion />,
       },
       {
-        path: "/thought-list",
+        path: '/thought-list',
         element: <ThoughtList />,
       },
       {
-        path: "/news-list",
+        path: '/news-list',
         element: <NewsList />,
       },
       {
-        path: "/painting-list",
+        path: '/painting-list',
         element: <PaintingList />,
       },
     ],
   },
   {
-    path: "/login",
+    path: '/login',
     element: <Login />,
   },
 ]);
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
+ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <RouterProvider router={router} />
-  </React.StrictMode>
+  </React.StrictMode>,
 );

@@ -20,14 +20,14 @@ import { ItemType } from 'antd/es/menu/interface';
 
 const Header = () => {
   const Menus = [
-    {
-      label: {
-        zh: '首页',
-        en: 'Homepage',
-        fr: 'Page d’acceuil',
-      },
-      path: '/',
-    },
+    // {
+    //   label: {
+    //     zh: '首页',
+    //     en: 'Homepage',
+    //     fr: 'Page d’acceuil',
+    //   },
+    //   path: '/',
+    // },
     {
       label: {
         zh: '思想作品集',
@@ -99,6 +99,11 @@ const Header = () => {
   const [locale] = useAtom(localeAtom);
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
+
+  console.log(pathname);
+  if (pathname === '/') {
+    navigate('/thought-list');
+  }
 
   console.log(pathname);
   const items: MenuProps['items'] = useMemo(() => {
@@ -173,6 +178,7 @@ const Header = () => {
   };
 
   const menuClick = (e: any) => {
+    console.log(e);
     navigate(e.key);
     setOpen(false);
   };
