@@ -25,9 +25,9 @@ import {
   updatePaint,
   uploadPaint,
 } from '../../api';
-import { useAsyncEffect, useUpdateEffect } from 'ahooks';
-import { isNil } from 'lodash';
-import { AddPaint, IThought, LanguageEnum } from '../../api/interface';
+import { useAsyncEffect } from 'ahooks';
+
+import { IThought, LanguageEnum } from '../../api/interface';
 
 const { Item } = Form;
 const { Dragger } = Upload;
@@ -89,7 +89,7 @@ const EditThought: FC<IProps> = (props) => {
         },
       };
       if (isRelated) {
-        params.articleInfo = JSON.stringify(relatedArticle);
+        params.articleGroupId = relatedArticle;
       }
 
       if (isEdit) {
@@ -126,9 +126,7 @@ const EditThought: FC<IProps> = (props) => {
         setCacheInfo(res);
         if (res.articleInfo) {
           setIsRelated(true);
-          setRelatedArticle({
-            articleGroupId: JSON.parse(res.articleInfo).articleGroupId,
-          });
+          setRelatedArticle(JSON.parse(res.articleInfo).articleGroupId);
         }
       }
     }
@@ -261,11 +259,9 @@ const EditThought: FC<IProps> = (props) => {
                 label: i.zh?.title,
                 value: i.groupId,
               }))}
-              value={relatedArticle?.articleGroupId}
+              value={relatedArticle}
               onChange={(v) => {
-                setRelatedArticle({
-                  articleGroupId: v,
-                });
+                setRelatedArticle(v);
               }}
             />
           </Item>
