@@ -35,7 +35,11 @@ const NewsList = () => {
       dataIndex: 'name',
       title: '名称',
       render: (_, record) => {
-        return <div className={tw`flex gap-2`}>{record.zh.title}</div>;
+        return (
+          <div className={tw`flex gap-2`}>
+            {(record.zh || record.en || record.fr).title}
+          </div>
+        );
       },
     },
     // {
@@ -46,21 +50,22 @@ const NewsList = () => {
       dataIndex: 'opearate',
       title: '操作',
       render: (_, record) => {
-        if (record.zh?.isDeleted) return '已删除';
+        const recordItem = record.zh || record.en || record.fr;
+        if (recordItem?.isDeleted) return '已删除';
         return (
           <div className={tw`flex gap-2`}>
-            {/* <Button
+            <Button
               type="primary"
               onClick={() => {
                 setOpen(true);
-                setId(record.groupId);
+                setId(recordItem.groupId);
               }}
             >
               编辑
-            </Button> */}
+            </Button>
             <Button
               type="dashed"
-              disabled={record.zh.isPublish}
+              disabled={recordItem.isPublish}
               onClick={() => {
                 Modal.confirm({
                   title: '发布',
@@ -78,7 +83,7 @@ const NewsList = () => {
             <Button
               type="primary"
               danger
-              disabled={!record.zh.isPublish}
+              disabled={!recordItem.isPublish}
               onClick={() => {
                 Modal.confirm({
                   title: '取消发布',
@@ -130,7 +135,9 @@ const NewsList = () => {
 
     setDislayList(
       (res || []).filter((i: any) =>
-        filters === 'all' ? !i.zh?.isDeleted : i.zh?.isDeleted,
+        filters === 'all'
+          ? !(i.zh || i.en || i.fr)?.isDeleted
+          : (i.zh || i.en || i.fr)?.isDeleted,
       ),
     );
   };
@@ -142,7 +149,9 @@ const NewsList = () => {
   useUpdateEffect(() => {
     setDislayList(
       (newsList || []).filter((i: any) =>
-        filters === 'all' ? !i.zh?.isDeleted : i.zh?.isDeleted,
+        filters === 'all'
+          ? !(i.zh || i.en || i.fr)?.isDeleted
+          : (i.zh || i.en || i.fr)?.isDeleted,
       ),
     );
   }, [filters]);

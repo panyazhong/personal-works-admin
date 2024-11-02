@@ -33,6 +33,8 @@ export type ExhibitionItem = {
   content: string;
   imgPath: string;
   author: string;
+  groupId?: number | string;
+  id?: number | string;
 };
 export interface Exhibition {
   [LanguageEnum.zh]: ExhibitionItem | null;

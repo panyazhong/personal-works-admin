@@ -59,19 +59,20 @@ const PaintingList = () => {
       dataIndex: 'opearate',
       title: '操作',
       render: (_, record) => {
-        if (record?.zh?.isDeleted) return '已删除';
+        const recordItem = record.zh || record.en || record.fr;
+        if (recordItem?.isDeleted) return '已删除';
         return (
           <div className={tw`flex gap-2`}>
             <Button
               type="link"
               onClick={() => {
-                setPreviewPath(record.zh.imgPath);
+                setPreviewPath(recordItem.imgPath);
                 setPreviewOpen(true);
               }}
             >
               查看图片
             </Button>
-            {/* <Button
+            <Button
               type="primary"
               onClick={() => {
                 setOpen(true);
@@ -79,10 +80,10 @@ const PaintingList = () => {
               }}
             >
               编辑
-            </Button>{' '} */}
+            </Button>{' '}
             <Button
               type="dashed"
-              disabled={record.zh.isPublish}
+              disabled={recordItem.isPublish}
               onClick={() => {
                 Modal.confirm({
                   title: '发布',
@@ -100,7 +101,7 @@ const PaintingList = () => {
             <Button
               type="primary"
               danger
-              disabled={!record.zh.isPublish}
+              disabled={!recordItem.isPublish}
               onClick={() => {
                 Modal.confirm({
                   title: '取消发布',
@@ -143,7 +144,9 @@ const PaintingList = () => {
       setPaintings(res);
       setDislayList(
         (res || []).filter((i: any) =>
-          filters === 'all' ? !i.zh?.isDeleted : i.zh?.isDeleted,
+          filters === 'all'
+            ? !(i.zh || i.en || i.fr)?.isDeleted
+            : (i.zh || i.en || i.fr)?.isDeleted,
         ),
       );
     });
@@ -161,7 +164,9 @@ const PaintingList = () => {
   useUpdateEffect(() => {
     setDislayList(
       (paintings || []).filter((i: any) =>
-        filters === 'all' ? !i.zh?.isDeleted : i.zh?.isDeleted,
+        filters === 'all'
+          ? !(i.zh || i.en || i.fr)?.isDeleted
+          : (i.zh || i.en || i.fr)?.isDeleted,
       ),
     );
   }, [filters]);

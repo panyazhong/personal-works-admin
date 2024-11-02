@@ -9,15 +9,20 @@ import {
   Upload,
   UploadProps,
 } from 'antd';
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import ReactQuill from 'react-quill';
 import { tw } from 'twind';
 import { css } from 'twind/css';
 import { thoughtDetailIdAtom, thoughtOpenAtom } from '.';
 import { InboxOutlined } from '@ant-design/icons';
-import { Exhibition, LanguageEnum } from '../../api/interface';
+import { Exhibition, ExhibitionItem, LanguageEnum } from '../../api/interface';
 import { useUpdateEffect } from 'ahooks';
-import { addExhibition, uploadPaint } from '../../api';
+import {
+  addExhibition,
+  queryExhibitionDetail,
+  updateExhibition,
+  uploadPaint,
+} from '../../api';
 
 const { Item } = Form;
 const { Dragger } = Upload;
@@ -32,7 +37,13 @@ const EditThought: FC<{ query: () => void }> = (props) => {
   const [open, setOpen] = useAtom(thoughtOpenAtom);
   const [id] = useAtom(thoughtDetailIdAtom);
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.zh);
-  const [operateInfo, setOperateInfo] = useState<Exhibition>(init);
+
+  const [cacheInfo, setCacheInfo] = useState<Partial<Exhibition>>({});
+  const [displayInfo, setDisplayInfo] = useState<ExhibitionItem>(
+    {} as ExhibitionItem,
+  );
+
+  const isEdit = useMemo(() => id, [id]);
 
   const [form] = Form.useForm();
 
@@ -43,13 +54,10 @@ const EditThought: FC<{ query: () => void }> = (props) => {
       fd.append('file', info.file as unknown as Blob);
 
       uploadPaint(fd).then((res) => {
-        setOperateInfo((prev) => {
+        setDisplayInfo((prev) => {
           return {
             ...prev,
-            [language]: {
-              ...prev[language],
-              imgPath: res,
-            },
+            imgPath: res,
           };
         });
       });
@@ -63,17 +71,23 @@ const EditThought: FC<{ query: () => void }> = (props) => {
 
   const click = async () => {
     try {
-      const valids = await form.validateFields();
-
+      const info = {
+        ...displayInfo,
+      };
+      if (isEdit) {
+        info.groupId = id;
+      }
       const params = {
-        ...operateInfo,
         [language]: {
-          ...operateInfo[language],
-          ...valids,
+          ...info,
         },
       };
 
-      await addExhibition(params);
+      if (isEdit) {
+        await updateExhibition(params);
+      } else {
+        await addExhibition(params);
+      }
 
       message.success('操作成功');
 
@@ -84,29 +98,36 @@ const EditThought: FC<{ query: () => void }> = (props) => {
     }
   };
 
-  const handleValusChange = (val: Exhibition[LanguageEnum.zh]) => {
-    setOperateInfo((prev) => {
+  const handleDisplay = (key: string, val: any) => {
+    setDisplayInfo((prev: any) => {
       return {
         ...prev,
-        [language]: {
-          ...prev[language],
-          ...val,
-        },
+        [key]: val,
       };
     });
   };
 
+  const getDetail = async () => {
+    const res = await queryExhibitionDetail({ groupId: id });
+
+    setCacheInfo(res);
+  };
+
   /**-------------------effects---------------- */
+
   useEffect(() => {
     if (open) {
+      if (id) {
+        getDetail();
+      }
+
       form.setFieldsValue(init[language]);
     }
   }, [open]);
 
-  useUpdateEffect(() => {
-    console.log(operateInfo[language]);
-    form.setFieldsValue(operateInfo[language] || { title: '', author: '' });
-  }, [language]);
+  useEffect(() => {
+    setDisplayInfo((cacheInfo || {})[language] || ({} as ExhibitionItem));
+  }, [language, cacheInfo]);
 
   return (
     <Modal
@@ -133,9 +154,6 @@ const EditThought: FC<{ query: () => void }> = (props) => {
       <Form
         layout="vertical"
         form={form}
-        onValuesChange={(_, vals) => {
-          handleValusChange(vals);
-        }}
         className={tw`
           text-frc-200
             ${css`
@@ -153,8 +171,6 @@ const EditThought: FC<{ query: () => void }> = (props) => {
             value={language}
             onChange={(e) => {
               setLanguage(e.target.value as LanguageEnum);
-
-              form.setFieldsValue(operateInfo[language]);
             }}
           >
             <Radio value={LanguageEnum.zh}>中文</Radio>
@@ -164,7 +180,6 @@ const EditThought: FC<{ query: () => void }> = (props) => {
         </Item>
         <Item
           label="展讯标题"
-          name="title"
           rules={[
             {
               required: true,
@@ -172,11 +187,16 @@ const EditThought: FC<{ query: () => void }> = (props) => {
             },
           ]}
         >
-          <Input placeholder="展讯标题" />
+          <Input
+            placeholder="展讯标题"
+            value={displayInfo.title}
+            onChange={(e) => {
+              handleDisplay('title', e.target.value);
+            }}
+          />
         </Item>
         <Item
           label="作者"
-          name="author"
           rules={[
             {
               required: true,
@@ -184,7 +204,13 @@ const EditThought: FC<{ query: () => void }> = (props) => {
             },
           ]}
         >
-          <Input placeholder="展讯标题" />
+          <Input
+            placeholder="展讯作者"
+            value={displayInfo.author}
+            onChange={(e) => {
+              handleDisplay('author', e.target.value);
+            }}
+          />
         </Item>
         <Item
           label="封面上传"
@@ -224,12 +250,9 @@ const EditThought: FC<{ query: () => void }> = (props) => {
               height: '500px',
             }}
             theme="snow"
-            value={operateInfo[language]?.content}
+            value={displayInfo?.content}
             onChange={(val) => {
-              handleValusChange({
-                ...operateInfo[language],
-                content: val,
-              } as Exhibition[LanguageEnum.zh]);
+              handleDisplay('content', val);
             }}
             modules={{
               toolbar: [

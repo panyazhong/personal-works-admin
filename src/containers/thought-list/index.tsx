@@ -41,7 +41,7 @@ const ThoughtList = () => {
       render: (_, record) => {
         return (
           <div className={tw(`truncate max-w-[300px]`)}>
-            {record.zh.title || '--'}
+            {(record.zh || record.en || record.fr).title || '--'}
           </div>
         );
       },
@@ -54,7 +54,9 @@ const ThoughtList = () => {
         return (
           <div
             className={tw``}
-            dangerouslySetInnerHTML={{ __html: record.zh.summary }}
+            dangerouslySetInnerHTML={{
+              __html: (record.zh || record.en || record.fr).summary,
+            }}
           />
         );
       },
@@ -64,21 +66,21 @@ const ThoughtList = () => {
       title: '操作',
       width: 100,
       render: (_, record) => {
-        if (record.zh?.isDeleted) return '已删除';
+        if ((record.zh || record.en || record.fr)?.isDeleted) return '已删除';
         return (
           <div className={tw`flex gap-2`}>
             <Button
               type="primary"
               onClick={() => {
                 setOpen(true);
-                setId(record.zh.groupId);
+                setId(record.groupId);
               }}
             >
               查看
             </Button>
             <Button
               type="dashed"
-              disabled={record.zh.isPublish}
+              disabled={(record.zh || record.en || record.fr).isPublish}
               onClick={() => {
                 Modal.confirm({
                   title: '发布',
@@ -96,7 +98,7 @@ const ThoughtList = () => {
             <Button
               type="primary"
               danger
-              disabled={!record.zh.isPublish}
+              disabled={!(record.zh || record.en || record.fr).isPublish}
               onClick={() => {
                 Modal.confirm({
                   title: '取消发布',
@@ -146,7 +148,9 @@ const ThoughtList = () => {
     setTableData(res);
     setDislayList(
       ((res || []) as any[]).filter((i: any) =>
-        filters === 'all' ? !i.zh?.isDeleted : i.zh?.isDeleted,
+        filters === 'all'
+          ? !(i.zh || i.en || i.fr)?.isDeleted
+          : (i.zh || i.en || i.fr)?.isDeleted,
       ),
     );
   };
@@ -158,7 +162,9 @@ const ThoughtList = () => {
   useUpdateEffect(() => {
     setDislayList(
       ((tableData || []) as any[]).filter((i: any) =>
-        filters === 'all' ? !i.zh?.isDeleted : i.zh?.isDeleted,
+        filters === 'all'
+          ? !(i.zh || i.en || i.fr)?.isDeleted
+          : (i.zh || i.en || i.fr)?.isDeleted,
       ),
     );
   }, [filters]);

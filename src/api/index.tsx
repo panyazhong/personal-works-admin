@@ -81,6 +81,17 @@ const addArticle = (data: any) => {
       return res.data;
     });
 };
+const editArticle = (data: any) => {
+  return axios
+    .request({
+      url: '/article/update',
+      method: 'post',
+      data,
+    })
+    .then((res) => {
+      return res.data;
+    });
+};
 
 /** ---------------paint----------------------------- */
 const queryPaintList = () => {
@@ -165,9 +176,20 @@ const uploadPaint = (data: any) => {
       return res.data;
     });
 };
+const updatePaint = (data: any) => {
+  return axios
+    .request({
+      url: '/paint/update',
+      method: 'post',
+      data,
+    })
+    .then((res) => {
+      return res.data;
+    });
+};
 
 /** ----------------------news-------------------------- */
-const addExhibition = (data: Exhibition) => {
+const addExhibition = (data: Partial<Exhibition>) => {
   return axios
     .request({
       url: '/exhibition/add',
@@ -235,6 +257,17 @@ const unPublishExhibition = (data: { groupId: string }) => {
       return res.data;
     });
 };
+const updateExhibition = (data: any) => {
+  return axios
+    .request({
+      url: '/exhibition/update',
+      method: 'post',
+      data,
+    })
+    .then((res) => {
+      return res.data;
+    });
+};
 
 export {
   login,
@@ -245,6 +278,7 @@ export {
   publishArticle,
   unPublishArticle,
   addArticle,
+  editArticle,
   // paint
   queryPaintList,
   queryPaintDetail,
@@ -253,6 +287,7 @@ export {
   unPublishPaint,
   uploadPaint,
   addPaint,
+  updatePaint,
   // news
   addExhibition,
   queryExhibitionList,
@@ -260,4 +295,5 @@ export {
   deleteExhibition,
   publishExhibition,
   unPublishExhibition,
+  updateExhibition,
 };

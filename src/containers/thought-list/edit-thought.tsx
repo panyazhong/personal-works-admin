@@ -11,14 +11,18 @@ import {
   UploadProps,
 } from 'antd';
 import { useAtom } from 'jotai';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import ReactQuill from 'react-quill';
 import { tw } from 'twind';
 import { css } from 'twind/css';
 import { thoughtDetailIdAtom, thoughtOpenAtom } from '.';
 import { InboxOutlined } from '@ant-design/icons';
-import { addArticle, queryArticleDetail, uploadPaint } from '../../api';
-import { Article, IThought } from '../../api/interface';
+import {
+  addArticle,
+  editArticle,
+  queryArticleDetail,
+  uploadPaint,
+} from '../../api';
 
 const { Item } = Form;
 const { Dragger } = Upload;
@@ -29,7 +33,11 @@ const EditThought = ({ query }: { query: () => void }) => {
   const [language, setLanguage] = useState('zh');
   const [form] = Form.useForm();
 
-  const [editInfo, setEditInfo] = useState<any>();
+  const isEdit = useMemo(() => id, [id]);
+
+  const [cacheInfo, setCacheInfo] = useState<any>();
+  const [displayInfo, setDisplayInfo] = useState<any>({});
+
   const defaultValue = {
     language: 'zh',
   };
@@ -41,13 +49,10 @@ const EditThought = ({ query }: { query: () => void }) => {
       fd.append('file', info.file as unknown as Blob);
 
       uploadPaint(fd).then((res) => {
-        setEditInfo((prev: any) => {
+        setDisplayInfo((prev: any) => {
           return {
             ...prev,
-            [language]: {
-              ...prev[language],
-              imgPath: res,
-            },
+            imgPath: res,
           };
         });
       });
@@ -57,21 +62,27 @@ const EditThought = ({ query }: { query: () => void }) => {
     },
   };
 
-  const title = id ? '编辑' : '新增';
+  const title = isEdit ? '编辑' : '新增';
 
   const click = async () => {
     try {
-      const valids = await form.validateFields();
-
+      const info = {
+        ...displayInfo,
+      };
+      if (isEdit) {
+        info.groupId = id;
+      }
       const params = {
-        ...editInfo,
         [language]: {
-          ...editInfo[language],
-          ...valids,
+          ...info,
         },
       };
 
-      await addArticle(params);
+      if (isEdit) {
+        await editArticle({ ...params });
+      } else {
+        await addArticle(params);
+      }
 
       message.success('操作成功');
 
@@ -85,20 +96,31 @@ const EditThought = ({ query }: { query: () => void }) => {
   const getThoughtDetail = async () => {
     const res = await queryArticleDetail({ groupId: id });
 
-    setEditInfo(res);
+    setCacheInfo(res);
+  };
 
-    form.setFieldsValue({
-      ...res['zh'],
-      language: 'zh',
+  const handleDisplay = (key: string, val: any) => {
+    setDisplayInfo((prev: any) => {
+      return {
+        ...prev,
+        [key]: val,
+      };
     });
   };
 
   useEffect(() => {
     if (open) {
-      getThoughtDetail();
+      if (id) {
+        getThoughtDetail();
+      }
+
       form.setFieldsValue(defaultValue);
     }
   }, [open]);
+
+  useEffect(() => {
+    setDisplayInfo((cacheInfo || {})[language] || {});
+  }, [language, cacheInfo]);
 
   return (
     <Modal
@@ -122,21 +144,23 @@ const EditThought = ({ query }: { query: () => void }) => {
       `}
       footer={
         <>
-          {id ? null : (
+          {
             <>
               <Button onClick={() => setOpen(false)}>取消</Button>
               <Button onClick={click} type="primary">
                 确认
               </Button>
             </>
-          )}
+          }
         </>
       }
     >
       <Alert message="三种语言版本需要分别提交保存！！！" banner />
+
       <Form
         layout="vertical"
         form={form}
+        key={language}
         className={tw`
           text-frc-200
             ${css`
@@ -163,7 +187,6 @@ const EditThought = ({ query }: { query: () => void }) => {
         </Item>
         <Item
           label="文章标题"
-          name="title"
           rules={[
             {
               required: true,
@@ -171,11 +194,16 @@ const EditThought = ({ query }: { query: () => void }) => {
             },
           ]}
         >
-          <Input placeholder="文章标题" />
+          <Input
+            placeholder="文章标题"
+            value={displayInfo.title}
+            onChange={(e) => {
+              handleDisplay('title', e.target.value);
+            }}
+          />
         </Item>
         <Item
-          label="文章标题"
-          name="author"
+          label="作者"
           rules={[
             {
               required: true,
@@ -183,18 +211,30 @@ const EditThought = ({ query }: { query: () => void }) => {
             },
           ]}
         >
-          <Input placeholder="请填写作者" />
+          <Input
+            placeholder="请填写作者"
+            value={displayInfo.author}
+            onChange={(e) => {
+              handleDisplay('author', e.target.value);
+            }}
+          />
         </Item>
         <Item
           label="文章简介"
-          name="summary"
           rules={[
             {
               message: '请填写文章简介',
             },
           ]}
         >
-          <Input.TextArea placeholder="文章简介" rows={4} />
+          <Input.TextArea
+            placeholder="文章简介"
+            rows={4}
+            value={displayInfo.summary}
+            onChange={(e) => {
+              handleDisplay('summary', e.target.value);
+            }}
+          />
         </Item>
 
         <Item
@@ -206,11 +246,9 @@ const EditThought = ({ query }: { query: () => void }) => {
             },
           ]}
         >
-          {id && (
+          {id && displayInfo?.imgPath && (
             <Image
-              src={`http://www.nanfang-art.com/home/pic${
-                (editInfo?.[language as keyof IThought] as Article)?.imgPath
-              }`}
+              src={`http://www.nanfang-art.com/home/pic${displayInfo?.imgPath}`}
               height={200}
               preview={false}
             />
@@ -243,23 +281,9 @@ const EditThought = ({ query }: { query: () => void }) => {
               height: '500px',
             }}
             theme="snow"
-            value={
-              (editInfo?.[language as keyof IThought] as Article)?.content || ''
-            }
+            value={displayInfo.content || ''}
             onChange={(val) => {
-              setEditInfo((prev: any) => {
-                if (!prev) {
-                  return {} as IThought;
-                }
-
-                return {
-                  ...prev,
-                  [language as keyof IThought]: {
-                    ...(prev[language as keyof IThought] as Article),
-                    content: val,
-                  },
-                };
-              });
+              handleDisplay('content', val);
             }}
             modules={{
               toolbar: [

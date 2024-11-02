@@ -2,6 +2,7 @@ import {
   Alert,
   Checkbox,
   Form,
+  Image,
   Input,
   message,
   Modal,
@@ -12,12 +13,18 @@ import {
   UploadProps,
 } from 'antd';
 import { useAtom } from 'jotai';
-import { FC, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { tw } from 'twind';
 import { css } from 'twind/css';
 import { thoughtDetailIdAtom, paintingOpenAtom } from '.';
 import { InboxOutlined } from '@ant-design/icons';
-import { addPaint, queryArticleList, uploadPaint } from '../../api';
+import {
+  addPaint,
+  queryArticleList,
+  queryPaintDetail,
+  updatePaint,
+  uploadPaint,
+} from '../../api';
 import { useAsyncEffect, useUpdateEffect } from 'ahooks';
 import { isNil } from 'lodash';
 import { AddPaint, IThought, LanguageEnum } from '../../api/interface';
@@ -35,13 +42,13 @@ const EditThought: FC<IProps> = (props) => {
 
   const [language, setLanguage] = useState<LanguageEnum>(LanguageEnum.zh);
   const [isRelated, setIsRelated] = useState<boolean>(false);
+  const [relatedArticle, setRelatedArticle] = useState<any>();
   const [articleList, setArticleList] = useState<IThought[]>([]);
-  const [editInfo, setEditInfo] = useState<AddPaint>({
-    zh: null,
-    en: null,
-    fr: null,
-    articleGroupId: null,
-  });
+
+  const isEdit = useMemo(() => id, [id]);
+
+  const [cacheInfo, setCacheInfo] = useState<any>();
+  const [displayInfo, setDisplayInfo] = useState<any>({});
   const [form] = Form.useForm();
 
   const upProps: UploadProps = {
@@ -53,13 +60,10 @@ const EditThought: FC<IProps> = (props) => {
       fd.append('file', info.file as unknown as Blob);
 
       uploadPaint(fd).then((res) => {
-        setEditInfo((prev) => {
+        setDisplayInfo((prev: any) => {
           return {
             ...prev,
-            [language]: {
-              ...prev[language],
-              imgPath: res,
-            },
+            imgPath: res,
           };
         });
       });
@@ -73,17 +77,26 @@ const EditThought: FC<IProps> = (props) => {
 
   const click = async () => {
     try {
-      const valids = await form.validateFields();
-
+      const info = {
+        ...displayInfo,
+      };
+      if (isEdit) {
+        info.groupId = id;
+      }
       const params = {
-        ...editInfo,
         [language]: {
-          ...editInfo[language],
-          ...valids,
+          ...info,
         },
       };
+      if (isRelated) {
+        params.articleInfo = JSON.stringify(relatedArticle);
+      }
 
-      await addPaint(params);
+      if (isEdit) {
+        await updatePaint(params);
+      } else {
+        await addPaint(params as any);
+      }
 
       message.success('新增成功');
       props.query();
@@ -93,19 +106,37 @@ const EditThought: FC<IProps> = (props) => {
     }
   };
 
+  const handleDisplay = (key: string, val: any) => {
+    setDisplayInfo((prev: any) => {
+      return {
+        ...prev,
+        [key]: val,
+      };
+    });
+  };
+
   /** -----------------effects---------------------- */
 
   useAsyncEffect(async () => {
     if (open) {
-      const res = await queryArticleList();
-      console.log(res);
-      setArticleList(res);
+      const l = await queryArticleList();
+      setArticleList(l);
+      if (id) {
+        const res = await queryPaintDetail({ groupId: id });
+        setCacheInfo(res);
+        if (res.articleInfo) {
+          setIsRelated(true);
+          setRelatedArticle({
+            articleGroupId: JSON.parse(res.articleInfo).articleGroupId,
+          });
+        }
+      }
     }
   }, [open]);
 
-  useUpdateEffect(() => {
-    form.setFieldsValue(editInfo[language]);
-  }, [language]);
+  useEffect(() => {
+    setDisplayInfo((cacheInfo || {})[language] || {});
+  }, [language, cacheInfo]);
 
   return (
     <Modal
@@ -133,18 +164,6 @@ const EditThought: FC<IProps> = (props) => {
       <Form
         layout="vertical"
         form={form}
-        onValuesChange={(_, vals) => {
-          setEditInfo((prev) => {
-            return {
-              ...prev,
-              [language]: {
-                ...prev[language],
-                ...vals,
-                topPosition: isNil(prev[language]?.topPosition) || 0,
-              },
-            };
-          });
-        }}
         className={tw`
           text-frc-200
             ${css`
@@ -169,23 +188,14 @@ const EditThought: FC<IProps> = (props) => {
         </Item>
         <Item label="是否置顶至轮播图">
           <Switch
-            checked={editInfo[language]?.topPosition === 1}
+            checked={displayInfo?.topPosition === 1}
             onChange={(checked) => {
-              setEditInfo((prev: AddPaint) => {
-                return {
-                  ...prev,
-                  [language]: {
-                    ...prev[language],
-                    topPosition: checked ? 1 : 0,
-                  },
-                };
-              });
+              handleDisplay('topPosition', checked ? 1 : 0);
             }}
           />
         </Item>
         <Item
           label="作品标题"
-          name="title"
           rules={[
             {
               required: true,
@@ -193,7 +203,13 @@ const EditThought: FC<IProps> = (props) => {
             },
           ]}
         >
-          <Input placeholder="作品标题" />
+          <Input
+            placeholder="作品标题"
+            value={displayInfo.title}
+            onChange={(e) => {
+              handleDisplay('title', e.target.value);
+            }}
+          />
         </Item>
         <Item
           label="作品描述"
@@ -205,7 +221,14 @@ const EditThought: FC<IProps> = (props) => {
             },
           ]}
         >
-          <Input.TextArea placeholder="作品描述" rows={4} />
+          <Input.TextArea
+            placeholder="作品描述"
+            rows={4}
+            value={displayInfo.content}
+            onChange={(e) => {
+              handleDisplay('summary', e.target.value);
+            }}
+          />
         </Item>
         <Item
           label="作者"
@@ -217,7 +240,13 @@ const EditThought: FC<IProps> = (props) => {
             },
           ]}
         >
-          <Input placeholder="作者" />
+          <Input
+            placeholder="作者"
+            value={displayInfo.author}
+            onChange={(e) => {
+              handleDisplay('author', e.target.value);
+            }}
+          />
         </Item>
         <Checkbox
           checked={isRelated}
@@ -232,6 +261,12 @@ const EditThought: FC<IProps> = (props) => {
                 label: i.zh?.title,
                 value: i.groupId,
               }))}
+              value={relatedArticle?.articleGroupId}
+              onChange={(v) => {
+                setRelatedArticle({
+                  articleGroupId: v,
+                });
+              }}
             />
           </Item>
         )}
@@ -244,6 +279,13 @@ const EditThought: FC<IProps> = (props) => {
             },
           ]}
         >
+          {id && displayInfo?.imgPath && (
+            <Image
+              src={`http://www.nanfang-art.com/home/pic${displayInfo?.imgPath}`}
+              height={200}
+              preview={false}
+            />
+          )}
           <Dragger {...upProps}>
             <p className="ant-upload-drag-icon">
               <InboxOutlined />
