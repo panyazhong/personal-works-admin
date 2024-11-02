@@ -211,7 +211,6 @@ const EditThought: FC<IProps> = (props) => {
         </Item>
         <Item
           label="作品描述"
-          name="content"
           rules={[
             {
               required: false,
@@ -224,11 +223,11 @@ const EditThought: FC<IProps> = (props) => {
             rows={4}
             value={displayInfo.content}
             onChange={(e) => {
-              handleDisplay('summary', e.target.value);
+              handleDisplay('content', e.target.value);
             }}
           />
         </Item>
-        <Item
+        {/* <Item
           label="作者"
           name="author"
           rules={[
@@ -245,7 +244,7 @@ const EditThought: FC<IProps> = (props) => {
               handleDisplay('author', e.target.value);
             }}
           />
-        </Item>
+        </Item> */}
         <Checkbox
           checked={isRelated}
           onChange={(e) => setIsRelated(e.target.checked)}
