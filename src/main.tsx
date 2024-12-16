@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { createHashRouter, RouterProvider } from 'react-router-dom';
 import App from './App.tsx';
 
-import JoinUnion from './containers/join-union/index.tsx';
+import ApplyList from './containers/apply-list/index.tsx';
 
 import './index.css';
 import Login from './login/index.tsx';
@@ -16,8 +16,8 @@ const router = createHashRouter([
     element: <App />,
     children: [
       {
-        path: '/join-union',
-        element: <JoinUnion />,
+        path: '/apply-list',
+        element: <ApplyList />,
       },
       {
         path: '/thought-list',

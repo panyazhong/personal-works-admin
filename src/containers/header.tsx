@@ -52,15 +52,15 @@ const Header = () => {
       },
       path: '/news-list',
     },
-    // {
-    //   label: {
-    //     zh: "海怪工作室",
-    //     en: "Atelier Sea Monster",
-    //     fr: "Atelier Sea Monster",
-    //   },
-    //   // path: "/personal-works",
-    //   path: "/studio-info",
-    // },
+    {
+      label: {
+        zh: '申请列表',
+        en: 'Atelier Sea Monster',
+        fr: 'Atelier Sea Monster',
+      },
+      // path: "/personal-works",
+      path: '/apply-list',
+    },
     // {
     //   label: {
     //     zh: "展讯",

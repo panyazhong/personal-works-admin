@@ -297,6 +297,29 @@ const updateExhibition = (data: any) => {
     });
 };
 
+/** ----------------------applyList---------------------- */
+const queryApplyList = () => {
+  return axios
+    .request({
+      url: '/apply/queryApplyList',
+      method: 'post',
+    })
+    .then((res) => {
+      return res.data;
+    });
+};
+const updateApplyList = (params: { id: string; isPass: 0 | 1 }) => {
+  return axios
+    .request({
+      url: '/apply/queryApplyList',
+      method: 'post',
+      data: params,
+    })
+    .then((res) => {
+      return res.data;
+    });
+};
+
 export {
   login,
   // article
@@ -326,4 +349,7 @@ export {
   publishExhibition,
   unPublishExhibition,
   updateExhibition,
+  // applyList
+  queryApplyList,
+  updateApplyList,
 };
