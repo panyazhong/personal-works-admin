@@ -37,6 +37,8 @@ const PaintingList = () => {
   const [displayList, setDislayList] = useState([]);
   const [previewPath, setPreviewPath] = useState('');
 
+  const [loading, setLoading] = useState(false);
+
   const columns: TableColumnType<any>[] = [
     {
       dataIndex: 'name',
@@ -140,8 +142,10 @@ const PaintingList = () => {
   ];
 
   const query = () => {
+    setLoading(true);
     queryPaintList().then((res) => {
       setPaintings(res);
+      setLoading(false);
       setDislayList(
         (res || []).filter((i: any) =>
           filters === 'all'
@@ -183,7 +187,12 @@ const PaintingList = () => {
           <Tabs.TabPane tab={i.label} key={i.value} />
         ))}
       </Tabs>
-      <Table columns={columns} pagination={false} dataSource={displayList} />
+      <Table
+        columns={columns}
+        pagination={false}
+        dataSource={displayList}
+        loading={loading}
+      />
       {open && <Editpainting query={query} />}
       {previewOpen && <PaintingPreview imgPath={previewPath} />}
     </div>

@@ -30,6 +30,8 @@ const NewsList = () => {
   const [, setId] = useAtom(thoughtDetailIdAtom);
   const [filters, setFilters] = useState<any>('all');
 
+  const [loading, setLoading] = useState(false);
+
   const columns: TableColumnType<any>[] = [
     {
       dataIndex: 'name',
@@ -130,8 +132,10 @@ const NewsList = () => {
   };
 
   const query = async () => {
+    setLoading(true);
     const res = await queryExhibitionList();
     setNewsList(res);
+    setLoading(false);
 
     setDislayList(
       (res || []).filter((i: any) =>
@@ -174,6 +178,7 @@ const NewsList = () => {
         pagination={false}
         dataSource={displayList}
         rowKey="groupId"
+        loading={loading}
       />
 
       {open && <EditThought query={query} />}

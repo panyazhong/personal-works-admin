@@ -2,13 +2,14 @@ import {
   Alert,
   Button,
   Form,
-  Image,
+  Image as AntdImg,
   Input,
   message,
   Modal,
   Radio,
   Upload,
   UploadProps,
+  Spin,
 } from 'antd';
 import { useAtom } from 'jotai';
 import { useEffect, useMemo, useState } from 'react';
@@ -21,8 +22,10 @@ import {
   addArticle,
   editArticle,
   queryArticleDetail,
-  uploadPaint,
+  uploadArticle,
 } from '../../api';
+
+// const pako = require('pako');
 
 const { Item } = Form;
 const { Dragger } = Upload;
@@ -38,6 +41,8 @@ const EditThought = ({ query }: { query: () => void }) => {
   const [cacheInfo, setCacheInfo] = useState<any>();
   const [displayInfo, setDisplayInfo] = useState<any>({});
 
+  const [loading, setLoading] = useState(false);
+
   const defaultValue = {
     language: 'zh',
   };
@@ -48,7 +53,7 @@ const EditThought = ({ query }: { query: () => void }) => {
       const fd = new FormData();
       fd.append('file', info.file as unknown as Blob);
 
-      uploadPaint(fd).then((res) => {
+      uploadArticle(fd).then((res) => {
         setDisplayInfo((prev: any) => {
           return {
             ...prev,
@@ -94,9 +99,11 @@ const EditThought = ({ query }: { query: () => void }) => {
   };
 
   const getThoughtDetail = async () => {
+    setLoading(true);
     const res = await queryArticleDetail({ groupId: id });
 
     setCacheInfo(res);
+    setLoading(false);
   };
 
   const handleDisplay = (key: string, val: any) => {
@@ -156,12 +163,16 @@ const EditThought = ({ query }: { query: () => void }) => {
       }
     >
       <Alert message="三种语言版本需要分别提交保存！！！" banner />
-
-      <Form
-        layout="vertical"
-        form={form}
-        key={language}
-        className={tw`
+      {loading ? (
+        <div className={tw`w-full h-[200px] flex justify-center items-center`}>
+          <Spin />
+        </div>
+      ) : (
+        <Form
+          layout="vertical"
+          form={form}
+          key={language}
+          className={tw`
           text-frc-200
             ${css`
               .ant-form-item .ant-form-item-label > label {
@@ -172,145 +183,146 @@ const EditThought = ({ query }: { query: () => void }) => {
               }
             `}
           `}
-      >
-        <Item label="请选择语言">
-          <Radio.Group
-            value={language}
-            onChange={(e) => {
-              setLanguage(e.target.value);
-            }}
+        >
+          <Item label="请选择语言">
+            <Radio.Group
+              value={language}
+              onChange={(e) => {
+                setLanguage(e.target.value);
+              }}
+            >
+              <Radio value={'zh'}>中文</Radio>
+              <Radio value={'en'}>英文</Radio>
+              <Radio value={'fr'}>法语</Radio>
+            </Radio.Group>
+          </Item>
+          <Item
+            label="文章标题"
+            rules={[
+              {
+                required: true,
+                message: '请填写文章标题',
+              },
+            ]}
           >
-            <Radio value={'zh'}>中文</Radio>
-            <Radio value={'en'}>英文</Radio>
-            <Radio value={'fr'}>法语</Radio>
-          </Radio.Group>
-        </Item>
-        <Item
-          label="文章标题"
-          rules={[
-            {
-              required: true,
-              message: '请填写文章标题',
-            },
-          ]}
-        >
-          <Input
-            placeholder="文章标题"
-            value={displayInfo.title}
-            onChange={(e) => {
-              handleDisplay('title', e.target.value);
-            }}
-          />
-        </Item>
-        <Item
-          label="作者"
-          rules={[
-            {
-              required: true,
-              message: '请填写作者',
-            },
-          ]}
-        >
-          <Input
-            placeholder="请填写作者"
-            value={displayInfo.author}
-            onChange={(e) => {
-              handleDisplay('author', e.target.value);
-            }}
-          />
-        </Item>
-        <Item
-          label="文章简介"
-          rules={[
-            {
-              message: '请填写文章简介',
-            },
-          ]}
-        >
-          <Input.TextArea
-            placeholder="文章简介"
-            rows={4}
-            value={displayInfo.summary}
-            onChange={(e) => {
-              handleDisplay('summary', e.target.value);
-            }}
-          />
-        </Item>
-
-        <Item
-          label="封面上传"
-          rules={[
-            {
-              // required: true,
-              // message: '请填写文章简介',
-            },
-          ]}
-        >
-          {id && displayInfo?.imgPath && (
-            <Image
-              src={`http://www.nanfang-art.com/home/pic${displayInfo?.imgPath}`}
-              height={200}
-              preview={false}
+            <Input
+              placeholder="文章标题"
+              value={displayInfo.title}
+              onChange={(e) => {
+                handleDisplay('title', e.target.value);
+              }}
             />
-          )}
-          <Dragger {...props}>
-            <p className="ant-upload-drag-icon">
-              <InboxOutlined />
-            </p>
-            <p className="ant-upload-text">
-              Click or drag file to this area to upload
-            </p>
-            <p className="ant-upload-hint">
-              Support for a single or bulk upload. Strictly prohibited from
-              uploading company data or other banned files.
-            </p>
-          </Dragger>
-        </Item>
-        <Item
-          label="文章内容"
-          className={tw`text-frc-300`}
-          rules={[
-            {
-              required: true,
-              message: '请填写文章内容',
-            },
-          ]}
-        >
-          <ReactQuill
-            style={{
-              height: '500px',
-            }}
-            theme="snow"
-            value={displayInfo.content || ''}
-            onChange={(val) => {
-              handleDisplay('content', val);
-            }}
-            modules={{
-              toolbar: [
-                ['bold', 'italic', 'underline', 'strike'], // toggled buttons
-                ['blockquote', 'code-block'],
+          </Item>
+          <Item
+            label="作者"
+            rules={[
+              {
+                required: true,
+                message: '请填写作者',
+              },
+            ]}
+          >
+            <Input
+              placeholder="请填写作者"
+              value={displayInfo.author}
+              onChange={(e) => {
+                handleDisplay('author', e.target.value);
+              }}
+            />
+          </Item>
+          <Item
+            label="文章简介"
+            rules={[
+              {
+                message: '请填写文章简介',
+              },
+            ]}
+          >
+            <Input.TextArea
+              placeholder="文章简介"
+              rows={4}
+              value={displayInfo.summary}
+              onChange={(e) => {
+                handleDisplay('summary', e.target.value);
+              }}
+            />
+          </Item>
 
-                // [{ header: [1, 2, false] }],
-                [{ list: 'ordered' }, { list: 'bullet' }],
-                [{ script: 'sub' }, { script: 'super' }],
-                [{ indent: '-1' }, { indent: '+1' }], // outdent/indent
-                [{ direction: 'rtl' }], // text direction
+          <Item
+            label="封面上传"
+            rules={[
+              {
+                // required: true,
+                // message: '请填写文章简介',
+              },
+            ]}
+          >
+            {displayInfo?.imgPath && (
+              <AntdImg
+                src={`http://www.nanfang-art.com${displayInfo?.imgPath}`}
+                height={200}
+                preview={false}
+              />
+            )}
+            <Dragger {...props}>
+              <p className="ant-upload-drag-icon">
+                <InboxOutlined />
+              </p>
+              <p className="ant-upload-text">
+                Click or drag file to this area to upload
+              </p>
+              <p className="ant-upload-hint">
+                Support for a single or bulk upload. Strictly prohibited from
+                uploading company data or other banned files.
+              </p>
+            </Dragger>
+          </Item>
+          <Item
+            label="文章内容"
+            className={tw`text-frc-300`}
+            rules={[
+              {
+                required: true,
+                message: '请填写文章内容',
+              },
+            ]}
+          >
+            <ReactQuill
+              style={{
+                height: '500px',
+              }}
+              theme="snow"
+              value={displayInfo.content || ''}
+              onChange={(val) => {
+                handleDisplay('content', val);
+              }}
+              modules={{
+                toolbar: [
+                  ['bold', 'italic', 'underline', 'strike'], // toggled buttons
+                  ['blockquote', 'code-block'],
 
-                // [{ size: ["small", false, "large", "huge"] }], // custom dropdown
-                [{ header: [1, 2, 3, 4, 5, 6, false] }],
+                  // [{ header: [1, 2, false] }],
+                  [{ list: 'ordered' }, { list: 'bullet' }],
+                  [{ script: 'sub' }, { script: 'super' }],
+                  [{ indent: '-1' }, { indent: '+1' }], // outdent/indent
+                  [{ direction: 'rtl' }], // text direction
 
-                [{ color: [] }, { background: [] }], // dropdown with defaults from theme
-                [{ font: [] }],
-                [{ align: [] }],
+                  // [{ size: ["small", false, "large", "huge"] }], // custom dropdown
+                  [{ header: [1, 2, 3, 4, 5, 6, false] }],
 
-                // ["clean"], // remove formatting button
+                  [{ color: [] }, { background: [] }], // dropdown with defaults from theme
+                  [{ font: [] }],
+                  [{ align: [] }],
 
-                ['link', 'image', 'video'], // link and image, video
-              ],
-            }}
-          />
-        </Item>
-      </Form>
+                  // ["clean"], // remove formatting button
+
+                  ['link', 'image', 'video'], // link and image, video
+                ],
+              }}
+            />
+          </Item>
+        </Form>
+      )}
     </Modal>
   );
 };

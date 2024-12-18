@@ -2,10 +2,12 @@ import { useAtom } from 'jotai';
 import {
   Alert,
   Form,
+  Image,
   Input,
   message,
   Modal,
   Radio,
+  Spin,
   Upload,
   UploadProps,
 } from 'antd';
@@ -16,12 +18,11 @@ import { css } from 'twind/css';
 import { thoughtDetailIdAtom, thoughtOpenAtom } from '.';
 import { InboxOutlined } from '@ant-design/icons';
 import { Exhibition, ExhibitionItem, LanguageEnum } from '../../api/interface';
-import { useUpdateEffect } from 'ahooks';
 import {
   addExhibition,
   queryExhibitionDetail,
   updateExhibition,
-  uploadPaint,
+  uploadExhibition,
 } from '../../api';
 
 const { Item } = Form;
@@ -47,13 +48,15 @@ const EditThought: FC<{ query: () => void }> = (props) => {
 
   const [form] = Form.useForm();
 
+  const [loading, setLoading] = useState(false);
+
   const upProps: UploadProps = {
     beforeUpload: () => false,
     onChange(info) {
       const fd = new FormData();
       fd.append('file', info.file as unknown as Blob);
 
-      uploadPaint(fd).then((res) => {
+      uploadExhibition(fd).then((res) => {
         setDisplayInfo((prev) => {
           return {
             ...prev,
@@ -108,9 +111,11 @@ const EditThought: FC<{ query: () => void }> = (props) => {
   };
 
   const getDetail = async () => {
+    setLoading(true);
     const res = await queryExhibitionDetail({ groupId: id });
 
     setCacheInfo(res);
+    setLoading(false);
   };
 
   /**-------------------effects---------------- */
@@ -151,10 +156,15 @@ const EditThought: FC<{ query: () => void }> = (props) => {
       `}
     >
       <Alert message="三种语言版本需要分别提交保存！！！" banner />
-      <Form
-        layout="vertical"
-        form={form}
-        className={tw`
+      {loading ? (
+        <div className={tw`w-full h-[200px] flex justify-center items-center`}>
+          <Spin />
+        </div>
+      ) : (
+        <Form
+          layout="vertical"
+          form={form}
+          className={tw`
           text-frc-200
             ${css`
               .ant-form-item .ant-form-item-label > label {
@@ -165,121 +175,129 @@ const EditThought: FC<{ query: () => void }> = (props) => {
               }
             `}
           `}
-      >
-        <Item label="请选择语言">
-          <Radio.Group
-            value={language}
-            onChange={(e) => {
-              setLanguage(e.target.value as LanguageEnum);
-            }}
+        >
+          <Item label="请选择语言">
+            <Radio.Group
+              value={language}
+              onChange={(e) => {
+                setLanguage(e.target.value as LanguageEnum);
+              }}
+            >
+              <Radio value={LanguageEnum.zh}>中文</Radio>
+              <Radio value={LanguageEnum.en}>英文</Radio>
+              <Radio value={LanguageEnum.fr}>法语</Radio>
+            </Radio.Group>
+          </Item>
+          <Item
+            label="展讯标题"
+            rules={[
+              {
+                required: true,
+                message: '请填写展讯标题',
+              },
+            ]}
           >
-            <Radio value={LanguageEnum.zh}>中文</Radio>
-            <Radio value={LanguageEnum.en}>英文</Radio>
-            <Radio value={LanguageEnum.fr}>法语</Radio>
-          </Radio.Group>
-        </Item>
-        <Item
-          label="展讯标题"
-          rules={[
-            {
-              required: true,
-              message: '请填写展讯标题',
-            },
-          ]}
-        >
-          <Input
-            placeholder="展讯标题"
-            value={displayInfo.title}
-            onChange={(e) => {
-              handleDisplay('title', e.target.value);
-            }}
-          />
-        </Item>
-        <Item
-          label="作者"
-          rules={[
-            {
-              required: true,
-              message: '请填写展讯标题',
-            },
-          ]}
-        >
-          <Input
-            placeholder="展讯作者"
-            value={displayInfo.author}
-            onChange={(e) => {
-              handleDisplay('author', e.target.value);
-            }}
-          />
-        </Item>
-        <Item
-          label="封面上传"
-          // name="imgPath"
-          rules={[
-            {
-              required: true,
-              message: '请上传封面',
-            },
-          ]}
-        >
-          <Dragger {...upProps}>
-            <p className="ant-upload-drag-icon">
-              <InboxOutlined />
-            </p>
-            <p className="ant-upload-text">
-              Click or drag file to this area to upload
-            </p>
-            <p className="ant-upload-hint">
-              Support for a single or bulk upload. Strictly prohibited from
-              uploading company data or other banned files.
-            </p>
-          </Dragger>
-        </Item>
-        <Item
-          label="展讯内容"
-          className={tw`text-frc-300`}
-          rules={[
-            {
-              required: true,
-              message: '请填写展讯内容',
-            },
-          ]}
-        >
-          <ReactQuill
-            style={{
-              height: '500px',
-            }}
-            theme="snow"
-            value={displayInfo?.content}
-            onChange={(val) => {
-              handleDisplay('content', val);
-            }}
-            modules={{
-              toolbar: [
-                ['bold', 'italic', 'underline', 'strike'], // toggled buttons
-                ['blockquote', 'code-block'],
+            <Input
+              placeholder="展讯标题"
+              value={displayInfo.title}
+              onChange={(e) => {
+                handleDisplay('title', e.target.value);
+              }}
+            />
+          </Item>
+          <Item
+            label="作者"
+            rules={[
+              {
+                required: true,
+                message: '请填写展讯标题',
+              },
+            ]}
+          >
+            <Input
+              placeholder="展讯作者"
+              value={displayInfo.author}
+              onChange={(e) => {
+                handleDisplay('author', e.target.value);
+              }}
+            />
+          </Item>
+          <Item
+            label="封面上传"
+            // name="imgPath"
+            rules={[
+              {
+                required: true,
+                message: '请上传封面',
+              },
+            ]}
+          >
+            {displayInfo?.imgPath && (
+              <Image
+                src={`http://www.nanfang-art.com${displayInfo?.imgPath}`}
+                height={200}
+                preview={false}
+              />
+            )}
+            <Dragger {...upProps}>
+              <p className="ant-upload-drag-icon">
+                <InboxOutlined />
+              </p>
+              <p className="ant-upload-text">
+                Click or drag file to this area to upload
+              </p>
+              <p className="ant-upload-hint">
+                Support for a single or bulk upload. Strictly prohibited from
+                uploading company data or other banned files.
+              </p>
+            </Dragger>
+          </Item>
+          <Item
+            label="展讯内容"
+            className={tw`text-frc-300`}
+            rules={[
+              {
+                required: true,
+                message: '请填写展讯内容',
+              },
+            ]}
+          >
+            <ReactQuill
+              style={{
+                height: '500px',
+              }}
+              theme="snow"
+              value={displayInfo?.content}
+              onChange={(val) => {
+                handleDisplay('content', val);
+              }}
+              modules={{
+                toolbar: [
+                  ['bold', 'italic', 'underline', 'strike'], // toggled buttons
+                  ['blockquote', 'code-block'],
 
-                // 1, 2, false] }],
-                [{ list: 'ordered' }, { list: 'bullet' }],
-                [{ script: 'sub' }, { script: 'super' }],
-                [{ indent: '-1' }, { indent: '+1' }], // outdent/indent
-                [{ direction: 'rtl' }], // text direction
+                  // 1, 2, false] }],
+                  [{ list: 'ordered' }, { list: 'bullet' }],
+                  [{ script: 'sub' }, { script: 'super' }],
+                  [{ indent: '-1' }, { indent: '+1' }], // outdent/indent
+                  [{ direction: 'rtl' }], // text direction
 
-                // [{ size: ["small", false, "large", "huge"] }], // custom dropdown
-                [{ header: [1, 2, 3, 4, 5, 6, false] }],
+                  // [{ size: ["small", false, "large", "huge"] }], // custom dropdown
+                  [{ header: [1, 2, 3, 4, 5, 6, false] }],
 
-                [{ color: [] }, { background: [] }], // dropdown with defaults from theme
-                [{ font: [] }],
-                [{ align: [] }],
+                  [{ color: [] }, { background: [] }], // dropdown with defaults from theme
+                  [{ font: [] }],
+                  [{ align: [] }],
 
-                // ["clean"], // remove formatting button
+                  // ["clean"], // remove formatting button
 
-                ['link', 'image', 'video'], // link and image, video
-              ],
-            }}
-          />
-        </Item>
-      </Form>
+                  ['link', 'image', 'video'], // link and image, video
+                ],
+              }}
+            />
+          </Item>
+        </Form>
+      )}
     </Modal>
   );
 };

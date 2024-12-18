@@ -8,6 +8,7 @@ import {
   Modal,
   Radio,
   Select,
+  Spin,
   Switch,
   Upload,
   UploadProps,
@@ -50,6 +51,8 @@ const EditThought: FC<IProps> = (props) => {
   const [cacheInfo, setCacheInfo] = useState<any>();
   const [displayInfo, setDisplayInfo] = useState<any>({});
   const [form] = Form.useForm();
+
+  const [loading, setLoading] = useState<boolean>(false);
 
   const upProps: UploadProps = {
     name: 'file',
@@ -119,15 +122,19 @@ const EditThought: FC<IProps> = (props) => {
 
   useAsyncEffect(async () => {
     if (open) {
+      setLoading(true);
       const l = await queryArticleList();
       setArticleList(l);
       if (id) {
         const res = await queryPaintDetail({ groupId: id });
         setCacheInfo(res);
+        setLoading(false);
         if (res.articleInfo) {
           setIsRelated(true);
           setRelatedArticle(JSON.parse(res.articleInfo).articleGroupId);
         }
+      } else {
+        setLoading(false);
       }
     }
   }, [open]);
@@ -159,10 +166,15 @@ const EditThought: FC<IProps> = (props) => {
       `}
     >
       <Alert message="三种语言版本需要分别提交保存！！！" banner />
-      <Form
-        layout="vertical"
-        form={form}
-        className={tw`
+      {loading ? (
+        <div className={tw`w-full h-[200px] flex justify-center items-center`}>
+          <Spin />
+        </div>
+      ) : (
+        <Form
+          layout="vertical"
+          form={form}
+          className={tw`
           text-frc-200
             ${css`
               .ant-form-item .ant-form-item-label > label {
@@ -173,61 +185,61 @@ const EditThought: FC<IProps> = (props) => {
               }
             `}
           `}
-      >
-        <Item label="请选择语言">
-          <Radio.Group
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
+        >
+          <Item label="请选择语言">
+            <Radio.Group
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+            >
+              <Radio value={'zh'}>中文</Radio>
+              <Radio value={'en'}>英文</Radio>
+              <Radio value={'fr'}>法语</Radio>
+            </Radio.Group>
+          </Item>
+          <Item label="是否置顶至轮播图">
+            <Switch
+              checked={displayInfo?.topPosition === 1}
+              onChange={(checked) => {
+                handleDisplay('topPosition', checked ? 1 : 0);
+              }}
+            />
+          </Item>
+          <Item
+            label="作品标题"
+            rules={[
+              {
+                required: true,
+                message: '请填写作品标题',
+              },
+            ]}
           >
-            <Radio value={'zh'}>中文</Radio>
-            <Radio value={'en'}>英文</Radio>
-            <Radio value={'fr'}>法语</Radio>
-          </Radio.Group>
-        </Item>
-        <Item label="是否置顶至轮播图">
-          <Switch
-            checked={displayInfo?.topPosition === 1}
-            onChange={(checked) => {
-              handleDisplay('topPosition', checked ? 1 : 0);
-            }}
-          />
-        </Item>
-        <Item
-          label="作品标题"
-          rules={[
-            {
-              required: true,
-              message: '请填写作品标题',
-            },
-          ]}
-        >
-          <Input
-            placeholder="作品标题"
-            value={displayInfo.title}
-            onChange={(e) => {
-              handleDisplay('title', e.target.value);
-            }}
-          />
-        </Item>
-        <Item
-          label="作品描述"
-          rules={[
-            {
-              required: false,
-              message: '请填写作品相关描述',
-            },
-          ]}
-        >
-          <Input.TextArea
-            placeholder="作品描述"
-            rows={4}
-            value={displayInfo.content}
-            onChange={(e) => {
-              handleDisplay('content', e.target.value);
-            }}
-          />
-        </Item>
-        {/* <Item
+            <Input
+              placeholder="作品标题"
+              value={displayInfo.title}
+              onChange={(e) => {
+                handleDisplay('title', e.target.value);
+              }}
+            />
+          </Item>
+          <Item
+            label="作品描述"
+            rules={[
+              {
+                required: false,
+                message: '请填写作品相关描述',
+              },
+            ]}
+          >
+            <Input.TextArea
+              placeholder="作品描述"
+              rows={4}
+              value={displayInfo.content}
+              onChange={(e) => {
+                handleDisplay('content', e.target.value);
+              }}
+            />
+          </Item>
+          {/* <Item
           label="作者"
           name="author"
           rules={[
@@ -245,56 +257,57 @@ const EditThought: FC<IProps> = (props) => {
             }}
           />
         </Item> */}
-        <Checkbox
-          checked={isRelated}
-          onChange={(e) => setIsRelated(e.target.checked)}
-        >
-          是否关联文章
-        </Checkbox>
-        {isRelated && (
-          <Item label="关联文章">
-            <Select
-              options={articleList.map((i) => ({
-                label: i.zh?.title,
-                value: i.groupId,
-              }))}
-              value={relatedArticle}
-              onChange={(v) => {
-                setRelatedArticle(v);
-              }}
-            />
-          </Item>
-        )}
-        <Item
-          label="上传作品"
-          rules={[
-            {
-              required: true,
-              message: '请上传作品',
-            },
-          ]}
-        >
-          {id && displayInfo?.imgPath && (
-            <Image
-              src={`http://www.nanfang-art.com/home/pic${displayInfo?.imgPath}`}
-              height={200}
-              preview={false}
-            />
+          <Checkbox
+            checked={isRelated}
+            onChange={(e) => setIsRelated(e.target.checked)}
+          >
+            是否关联文章
+          </Checkbox>
+          {isRelated && (
+            <Item label="关联文章">
+              <Select
+                options={articleList.map((i) => ({
+                  label: i.zh?.title,
+                  value: i.groupId,
+                }))}
+                value={relatedArticle}
+                onChange={(v) => {
+                  setRelatedArticle(v);
+                }}
+              />
+            </Item>
           )}
-          <Dragger {...upProps}>
-            <p className="ant-upload-drag-icon">
-              <InboxOutlined />
-            </p>
-            <p className="ant-upload-text">
-              Click or drag file to this area to upload
-            </p>
-            <p className="ant-upload-hint">
-              Support for a single or bulk upload. Strictly prohibited from
-              uploading company data or other banned files.
-            </p>
-          </Dragger>
-        </Item>
-      </Form>
+          <Item
+            label="上传作品"
+            rules={[
+              {
+                required: true,
+                message: '请上传作品',
+              },
+            ]}
+          >
+            {displayInfo?.imgPath && (
+              <Image
+                src={`http://www.nanfang-art.com${displayInfo?.imgPath}`}
+                height={200}
+                preview={false}
+              />
+            )}
+            <Dragger {...upProps}>
+              <p className="ant-upload-drag-icon">
+                <InboxOutlined />
+              </p>
+              <p className="ant-upload-text">
+                Click or drag file to this area to upload
+              </p>
+              <p className="ant-upload-hint">
+                Support for a single or bulk upload. Strictly prohibited from
+                uploading company data or other banned files.
+              </p>
+            </Dragger>
+          </Item>
+        </Form>
+      )}
     </Modal>
   );
 };

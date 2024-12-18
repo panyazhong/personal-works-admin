@@ -92,6 +92,20 @@ const editArticle = (data: any) => {
       return res.data;
     });
 };
+const uploadArticle = (data: any) => {
+  return axios
+    .request({
+      url: '/article/upload',
+      method: 'post',
+      data,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+    .then((res) => {
+      return res.data;
+    });
+};
 
 /** ---------------paint----------------------------- */
 const queryPaintList = () => {
@@ -189,6 +203,20 @@ const updatePaint = (data: any) => {
 };
 
 /** ----------------------news-------------------------- */
+const uploadExhibition = (data: any) => {
+  return axios
+    .request({
+      url: '/exhibition/upload',
+      method: 'post',
+      data,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+    .then((res) => {
+      return res.data;
+    });
+};
 const addExhibition = (data: Partial<Exhibition>) => {
   return axios
     .request({
@@ -279,6 +307,7 @@ export {
   unPublishArticle,
   addArticle,
   editArticle,
+  uploadArticle,
   // paint
   queryPaintList,
   queryPaintDetail,
@@ -289,6 +318,7 @@ export {
   addPaint,
   updatePaint,
   // news
+  uploadExhibition,
   addExhibition,
   queryExhibitionList,
   queryExhibitionDetail,

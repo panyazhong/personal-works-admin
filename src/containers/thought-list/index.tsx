@@ -33,6 +33,8 @@ const ThoughtList = () => {
   const [tableData, setTableData] = useState<any[]>([]);
   const [displayList, setDislayList] = useState<any[]>([]);
 
+  const [loading, setLoading] = useState(true);
+
   const columns: TableColumnType<any>[] = [
     {
       dataIndex: 'name',
@@ -143,8 +145,10 @@ const ThoughtList = () => {
 
   const getThoughtList = async () => {
     // 获取数据并设置到tableData
+    setLoading(true);
     const res = await queryArticleList();
 
+    setLoading(false);
     setTableData(res);
     setDislayList(
       ((res || []) as any[]).filter((i: any) =>
@@ -186,6 +190,7 @@ const ThoughtList = () => {
         pagination={false}
         dataSource={displayList}
         rowKey={(record) => record.groupId}
+        loading={loading}
       />
       {open && <EditThought query={getThoughtList} />}
     </div>
