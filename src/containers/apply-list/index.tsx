@@ -1,4 +1,12 @@
-import { Button, message, Modal, Table, TableColumnType, Tabs } from 'antd';
+import {
+  Button,
+  message,
+  Modal,
+  Radio,
+  Table,
+  TableColumnType,
+  Tabs,
+} from 'antd';
 import { tw } from 'twind';
 import { atom, useAtom } from 'jotai';
 import { queryApplyList, updateApplyList } from '../../api';
@@ -12,6 +20,12 @@ const ApplyList = () => {
   const [open, setOpen] = useAtom(thoughtOpenAtom);
   const [, setId] = useAtom(thoughtDetailIdAtom);
   const [filters, setFilters] = useState<any>('all');
+
+  const [newsList, setNewsList] = useState([]);
+  const [displayList, setDislayList] = useState([]);
+  const [isProcess, setIsProcess] = useState(0);
+
+  const [loading, setLoading] = useState(false);
 
   const columns: TableColumnType<any>[] = [
     {
@@ -34,11 +48,28 @@ const ApplyList = () => {
       title: '补充信息',
     },
     {
+      dataIndex: 'isPass',
+      title: '处理结果',
+      hidden: isProcess === 0,
+      render: (text) => {
+        const res = text ? '已通过' : '已拒绝';
+        return (
+          <span
+            className={tw`${
+              text ? 'text-[rgb(16,188,121)]' : 'text-[rgb(250,80,81)]'
+            }`}
+          >
+            {res}
+          </span>
+        );
+      },
+    },
+    {
       dataIndex: 'opearate',
       title: '操作',
       render: (_, record) => {
         return (
-          <div className={tw`flex gap-2`}>
+          <div className={tw`flex gap-2 items-center`}>
             <Button
               type="primary"
               onClick={() => {
@@ -56,26 +87,27 @@ const ApplyList = () => {
                 Modal.confirm({
                   title: '驳回',
                   content: '确定驳回吗',
-                  onOk: handleUpdateApplyList({
-                    id: record.id,
-                    isPass: 0,
-                  }),
+                  onOk: () => {
+                    handleUpdateApplyList({
+                      id: record.id,
+                      isPass: 0,
+                    });
+                  },
                 });
               }}
             >
               驳回
             </Button>
-            <a download={`http://www.nanfang-art.com${record.filePath}`}>
-              下载文件
-            </a>
+            {record.filePath && (
+              <a href={`http://www.nanfang-art.com${record.filePath}`} download>
+                下载文件
+              </a>
+            )}
           </div>
         );
       },
     },
   ];
-
-  const [newsList, setNewsList] = useState([]);
-  const [displayList, setDislayList] = useState([]);
 
   const handleAdd = () => {
     setId('');
@@ -89,7 +121,10 @@ const ApplyList = () => {
   };
 
   const query = async () => {
-    const res = await queryApplyList();
+    setLoading(true);
+    const res = await queryApplyList({ isProcess });
+    setLoading(false);
+
     setNewsList(res);
 
     setDislayList(res);
@@ -97,15 +132,27 @@ const ApplyList = () => {
 
   useEffect(() => {
     query();
-  }, []);
+  }, [isProcess]);
 
   return (
     <div>
+      <Radio.Group
+        onChange={(e) => setIsProcess(e.target.value)}
+        value={isProcess}
+      >
+        <Radio value={0} className={tw`text-[#fff]`}>
+          未处理
+        </Radio>
+        <Radio value={1} className={tw`text-[#fff]`}>
+          已处理
+        </Radio>
+      </Radio.Group>
       <Table
         columns={columns}
         pagination={false}
         dataSource={displayList}
         rowKey="id"
+        loading={loading}
       />
     </div>
   );

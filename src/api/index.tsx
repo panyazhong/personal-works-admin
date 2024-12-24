@@ -298,11 +298,12 @@ const updateExhibition = (data: any) => {
 };
 
 /** ----------------------applyList---------------------- */
-const queryApplyList = () => {
+const queryApplyList = (data: { isProcess: 1 | 0; isPass?: 1 | 0 }) => {
   return axios
     .request({
       url: '/apply/queryApplyList',
       method: 'post',
+      data,
     })
     .then((res) => {
       return res.data;
@@ -311,7 +312,7 @@ const queryApplyList = () => {
 const updateApplyList = (params: { id: string; isPass: 0 | 1 }) => {
   return axios
     .request({
-      url: '/apply/queryApplyList',
+      url: '/apply/updateApply',
       method: 'post',
       data: params,
     })
